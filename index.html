@@ -61,6 +61,8 @@
       .animate-fade-in {
         animation: fadeIn 0.5s ease-out forwards;
       }
+      .markdown-body ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
+      .markdown-body strong { color: #4a6c48; }
     </style>
 </head>
 <body>
@@ -77,9 +79,13 @@
         ShoppingBag, Footprints, Store, Ticket, Table, TrainFront, Map,
         CheckCircle, XCircle, Clock, Banknote, ClipboardCheck,
         ArrowRightLeft, RefreshCw, Coins, Calculator, ExternalLink,
-        Thermometer
+        Thermometer, Sparkles, Loader2
       } from 'lucide-react';
       import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+
+      // --- CONFIGURATION ---
+      // ⚠️ 請在此填入您的 Gemini API Key 才能啟用 AI 推薦功能
+      const GEMINI_API_KEY = ""; 
 
       // --- DATA ---
 
@@ -279,6 +285,14 @@
         { category: "🍲【2】即食 (1F/2F)", items: ["S&B 金牌咖哩 (甘口)", "日清烏龍麵杯 (溫和)", "味噌湯組合包 (10入)"] },
         { category: "💊【3】藥妝 (2F)", items: ["Rohto 眼藥水 V5", "Rohto 金色眼藥水", "PAIR 祛痘膏", "AD/Muhi 止癢乳液", "小孩退熱貼 (必買)"] },
         { category: "🧸【4】兒童 (3F)", items: ["入浴球 (驚喜玩具)", "麵包超人牙刷 3入組"] }
+      ];
+
+      const TRANSPORT_TICKETS = [
+        { d: "D1", route: "名鐵 µSKY", ticket: "指定席券", price: "¥1250", color: "bg-red-100 text-red-800", tip: "若佔位需購兒童票 (不佔位免費)。\n建議抵達後去人工櫃台購票，可順便劃位回程。" },
+        { d: "D2", route: "あおなみ線", ticket: "一日券", price: "¥870", color: "bg-blue-100 text-blue-800", tip: "樂園入口可停推車 (不可入園)。\n一日券只要來回一趟+中途下車一次就划算。" },
+        { d: "D3", route: "KKday 巴士", ticket: "團費包含", price: "-", color: "bg-orange-100 text-orange-800", tip: "幼童含在團費中 (有座位)。\n長途車程建議準備小玩具或貼紙書安撫。" },
+        { d: "D4", route: "東山線+Linimo", ticket: "24h券+單程", price: "¥1140", color: "bg-yellow-100 text-yellow-800", tip: "大倉庫內禁推車 (入口免費寄放)。\n部分展區較冷，幼童請帶薄外套。" },
+        { d: "D5", route: "名鐵巴士", ticket: "套票", price: "¥3700", color: "bg-purple-100 text-purple-800", tip: "套票含¥1000金券，可在 Outlet 或燈會使用。" },
       ];
 
       // --- HELPERS ---
@@ -677,13 +691,7 @@
             <section>
               <h2 className="text-lg font-bold text-blue-700 mb-2">每日交通總表</h2>
               <div className="space-y-3">
-                {[
-                  {d:"D1", route:"名鐵 µSKY", ticket:"指定席券", price:"¥1250", color:"bg-red-100 text-red-800", tip: "若佔位需購兒童票 (不佔位免費)。\n建議抵達後去人工櫃台購票，可順便劃位回程。"},
-                  {d:"D2", route:"あおなみ線", ticket:"一日券", price:"¥870", color:"bg-blue-100 text-blue-800", tip: "樂園入口可停推車 (不可入園)。\n一日券只要來回一趟+中途下車一次就划算。"},
-                  {d:"D3", route:"KKday 巴士", ticket:"團費包含", price:"-", color:"bg-orange-100 text-orange-800", tip: "幼童含在團費中 (有座位)。\n長途車程建議準備小玩具或貼紙書安撫。"},
-                  {d:"D4", route:"東山線+Linimo", ticket:"24h券+單程", price:"¥1140", color:"bg-yellow-100 text-yellow-800", tip: "大倉庫內禁推車 (入口免費寄放)。\n部分展區較冷，幼童請帶薄外套。"},
-                  {d:"D5", route:"名鐵巴士", ticket:"套票", price:"¥3700", color:"bg-purple-100 text-purple-800", tip: "套票含¥1000金券，可在 Outlet 或燈會使用。"},
-                ].map((row, i) => (
+                {TRANSPORT_TICKETS.map((row, i) => (
                   <div key={i} className="flex flex-col gap-2 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3">
                       <span className="font-bold text-gray-500 w-8">{row.d}</span>
@@ -843,6 +851,125 @@
         </div>
       );
 
+      const AIConciergeModal = ({ onClose }) => {
+        const [status, setStatus] = useState('INIT'); // INIT, LOCATING, THINKING, RESULT, ERROR
+        const [result, setResult] = useState('');
+        const [location, setLocation] = useState(null);
+
+        useEffect(() => {
+          handleStart();
+        }, []);
+
+        const handleStart = () => {
+          if (!GEMINI_API_KEY) {
+            setStatus('ERROR');
+            setResult('請先在程式碼中填入 GEMINI_API_KEY 才能使用此功能。');
+            return;
+          }
+
+          if (!navigator.geolocation) {
+            setStatus('ERROR');
+            setResult('您的瀏覽器不支援地理定位功能。');
+            return;
+          }
+
+          setStatus('LOCATING');
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const { latitude, longitude } = pos.coords;
+              setLocation({ lat: latitude, lng: longitude });
+              askGemini(latitude, longitude);
+            },
+            (err) => {
+              console.error(err);
+              setStatus('ERROR');
+              setResult('無法獲取您的位置，請確認已授權定位功能。');
+            }
+          );
+        };
+
+        const askGemini = async (lat, lng) => {
+          setStatus('THINKING');
+          try {
+            const prompt = `我現在位置在緯度 ${lat}, 經度 ${lng}。請扮演一位名古屋親子旅遊導遊，推薦我目前附近 3 個適合帶 4 歲小孩去的餐廳或景點。請用繁體中文回答，並以 Markdown 列表格式呈現，包含地點名稱、特色簡介、與步行大約時間。`;
+            
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+              })
+            });
+            
+            const data = await response.json();
+            if (data.candidates && data.candidates[0].content) {
+              setResult(data.candidates[0].content.parts[0].text);
+              setStatus('RESULT');
+            } else {
+              throw new Error('No content returned');
+            }
+          } catch (e) {
+            console.error(e);
+            setStatus('ERROR');
+            setResult('AI 暫時無法回應，請稍後再試。');
+          }
+        };
+
+        return (
+          <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white w-full max-w-md rounded-2xl p-5 shadow-2xl max-h-[80vh] overflow-y-auto relative">
+              <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <XCircle size={24} />
+              </button>
+
+              <div className="flex flex-col items-center mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white mb-2 shadow-lg">
+                  <Sparkles size={24} />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800">AI 隨身導遊</h2>
+                <p className="text-xs text-gray-500">基於您現在位置的推薦</p>
+              </div>
+
+              {status === 'LOCATING' && (
+                <div className="flex flex-col items-center py-8 text-gray-500 gap-3">
+                  <MapPin className="animate-bounce text-indigo-500" size={32} />
+                  <span>正在定位中...</span>
+                </div>
+              )}
+
+              {status === 'THINKING' && (
+                <div className="flex flex-col items-center py-8 text-gray-500 gap-3">
+                  <Loader2 className="animate-spin text-purple-500" size={32} />
+                  <span>AI 正在思考推薦名單...</span>
+                </div>
+              )}
+
+              {status === 'RESULT' && (
+                <div className="prose prose-sm max-w-none text-gray-700 markdown-body bg-gray-50 p-4 rounded-xl border border-gray-100">
+                  <div dangerouslySetInnerHTML={{ 
+                    __html: result
+                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                      .replace(/\n/g, '<br/>')
+                  }} />
+                  <div className="mt-4 text-center">
+                    <button onClick={() => openGoogleMaps(`${location.lat},${location.lng}`)} className="text-xs text-blue-500 underline">
+                      在 Google Maps 查看我的位置
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {status === 'ERROR' && (
+                <div className="bg-red-50 text-red-600 p-4 rounded-xl text-center text-sm border border-red-100">
+                  <AlertCircle className="mx-auto mb-2" size={24} />
+                  {result}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      };
+
       const BottomNav = ({ activeTab, onTabChange }) => (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md border border-gray-200 shadow-2xl rounded-full px-6 py-3 flex items-center gap-8 z-50">
           <button 
@@ -875,6 +1002,7 @@
         const [activeTab, setActiveTab] = useState('HOME');
         const [selectedDayId, setSelectedDayId] = useState(null);
         const [view, setView] = useState('MAIN'); // MAIN, TRANSPORT, FOOD, FULL_MAP, TAIKO_SHOPPING
+        const [showAI, setShowAI] = useState(false);
         
         // Lift weather state to App so header can access it
         const { weather, loading } = useNagoyaWeather();
@@ -980,6 +1108,17 @@
              {activeTab === 'HOME' && renderHome()}
              {activeTab === 'CURRENCY' && <CurrencyView />}
              {activeTab === 'TOOLS' && <ToolsView />}
+             
+             {/* AI FAB Button */}
+             <button 
+                onClick={() => setShowAI(true)}
+                className="fixed bottom-24 right-4 bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-4 rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all z-40 flex items-center justify-center"
+             >
+                <Sparkles size={24} />
+             </button>
+
+             {showAI && <AIConciergeModal onClose={() => setShowAI(false)} />}
+
              <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
           </div>
         );
