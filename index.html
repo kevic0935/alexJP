@@ -75,7 +75,7 @@
         MapPin, Utensils, AlertCircle, Plane, Bed, Wallet, 
         ChevronLeft, Calendar, Info, Navigation, ArrowRight,
         ShoppingBag, Footprints, Store, Ticket, Table, TrainFront, Map,
-        CheckCircle, XCircle, Clock, Banknote
+        CheckCircle, XCircle, Clock, Banknote, ClipboardCheck
       } from 'lucide-react';
       import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -455,6 +455,47 @@
               </Card>
             </div>
 
+            {/* New Pre-trip Card */}
+            <div className="px-4">
+              <Card className="border-l-4 border-indigo-400">
+                  <h3 className="flex items-center gap-2 font-bold text-indigo-600 mb-3">
+                      <ClipboardCheck size={20} /> 行前檢查與準備
+                  </h3>
+                  <div className="space-y-3 text-sm">
+                      <div>
+                          <h4 className="font-bold text-ghibli-brown flex items-center gap-1.5 mb-1">
+                            <span className="bg-indigo-100 p-1 rounded-full text-indigo-600"><CheckCircle size={12}/></span> 
+                            證件與網卡
+                          </h4>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-gray-600 pl-1">
+                              <li>檢查護照效期 (需 &gt; 6 個月)</li>
+                              <li>填寫 Visit Japan Web (入境/海關) 並截圖 QR Code</li>
+                              <li><strong>自駕必備</strong>: 台灣駕照正本 + 日文譯本</li>
+                              <li>購買網卡/開通漫遊 (建議一下飛機即可使用)</li>
+                          </ul>
+                      </div>
+                      <div className="border-t border-gray-100 pt-3">
+                           <h4 className="font-bold text-ghibli-brown flex items-center gap-1.5 mb-1">
+                            <span className="bg-orange-100 p-1 rounded-full text-orange-600"><ShoppingBag size={12}/></span> 
+                            行李打包重點
+                          </h4>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-gray-600 pl-1">
+                              <li>衣物: 洋蔥式穿搭 (戶外冷/室內暖氣強)</li>
+                              <li>藥品: 兒童常備藥 (退燒、止咳、益生菌) & 體溫計</li>
+                              <li>電子: 行動電源 (隨身帶)、充電線、轉接頭(日本兩孔)</li>
+                          </ul>
+                      </div>
+                      <div className="border-t border-gray-100 pt-3">
+                           <h4 className="font-bold text-ghibli-brown flex items-center gap-1.5 mb-1">
+                            <span className="bg-green-100 p-1 rounded-full text-green-600"><Banknote size={12}/></span> 
+                            貨幣建議
+                          </h4>
+                          <p className="text-xs text-gray-600 pl-1">建議每人準備 ¥30,000 現金 (老街/停車/販賣機)，其餘以高回饋信用卡為主。</p>
+                      </div>
+                  </div>
+              </Card>
+            </div>
+
             <div className="px-4">
               <Card className="border-l-4 border-red-400">
                   <h3 className="flex items-center gap-2 font-bold text-red-500 mb-3">
@@ -786,7 +827,7 @@
                         <Ticket size={18} className="text-ghibli-green"/> 4 歲幼童票券規則
                     </h3>
                     <div className="overflow-x-auto">
-                        <table className="w-full text-xs text-left">
+                         <table className="w-full text-xs text-left">
                             <thead className="bg-gray-50 text-gray-700 font-bold border-b">
                                 <tr>
                                     <th className="p-2 whitespace-nowrap">交通方式</th>
