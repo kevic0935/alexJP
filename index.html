@@ -30,7 +30,6 @@
     </script>
 
     <!-- React & Babel Setup -->
-    <!-- Import Map for handling modules without build tools -->
     <script type="importmap">
     {
       "imports": {
@@ -42,7 +41,6 @@
       }
     }
     </script>
-    <!-- Babel for in-browser JSX transformation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
@@ -50,6 +48,7 @@
         background-color: #f4f1ea;
         color: #5c4839;
         -webkit-font-smoothing: antialiased;
+        padding-bottom: 100px; /* Space for bottom nav */
       }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -76,12 +75,12 @@
         ChevronLeft, Calendar, Info, Navigation, ArrowRight,
         ShoppingBag, Footprints, Store, Ticket, Table, TrainFront, Map,
         CheckCircle, XCircle, Clock, Banknote, ClipboardCheck,
-        ArrowRightLeft, RefreshCw, Coins, Calculator
+        ArrowRightLeft, RefreshCw, Coins, Calculator, ExternalLink
       } from 'lucide-react';
       import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
-      // --- Constants & Data ---
-      
+      // --- DATA ---
+
       const ITINERARY_DATA = [
         {
           id: 1,
@@ -257,1070 +256,642 @@
         }
       ];
 
-      const SHOPPING_SPOTS = [
+      const TAIKO_SHOPS = [
         { name: "MaxValu 太閤店", dist: "12分", type: "超市", tag: "24H・種類齊", note: "最推薦", navLink: "MaxValu Taiko" },
-        { name: "Donki 名站西店", dist: "6分", type: "百貨", tag: "零食藥妝", note: "必逛", navLink: "Don Quijote Nagoya Station West" },
         { name: "Sun-Ace 龜島店", dist: "11分", type: "超市", tag: "便宜・在地", note: "非24H", navLink: "Sun-Ace Kamejima" },
-        { name: "Sugi Drug (スギ薬局)", dist: "5分", type: "藥妝", tag: "比松本清俗", note: "生活用品", navLink: "Sugi Drug Nagoya Station West" },
-        { name: "松本清 名古屋西口", dist: "6分", type: "藥妝", tag: "爆品全", note: "", navLink: "Matsumoto Kiyoshi Nagoya Station West" },
-        { name: "AEON MALL (龜島周邊)", dist: "15分", type: "商城", tag: "兒童玩具", note: "Noritake Garden", navLink: "Aeon Mall Nagoya Noritake Garden" },
+        { name: "Donki 名站西店", dist: "6分", type: "百貨", tag: "零食藥妝", note: "必逛", navLink: "Don Quijote Nagoya Station West" },
+        { name: "Sugi Drug (スギ薬局)", dist: "5分", type: "藥妝", tag: "奶粉濕紙巾", note: "生活用品", navLink: "Sugi Drug Nagoya Station West" },
+        { name: "松本清 名古屋西口", dist: "6分", type: "藥妝", tag: "爆品全", note: "感冒腸胃藥", navLink: "Matsumoto Kiyoshi Nagoya Station West" },
+        { name: "AEON 龜島", dist: "15分", type: "商城", tag: "兒童玩具", note: "最後補貨", navLink: "Aeon Mall Nagoya Noritake Garden" },
         { name: "7-11 / Lawson", dist: "1-3分", type: "超商", tag: "快速補給", note: "", navLink: "Convenience Store near Daiwa Roynet Hotel Nagoya Taiko dori Side" },
       ];
 
-      const SHOPPING_ROUTES = [
-        { title: "最省力路線", desc: "飯店 → 超商 → 回房", tag: "累癱專用" },
-        { title: "超市採買路線", desc: "飯店 → Donki → MaxValu", tag: "補貨專用" },
-        { title: "兒童用品路線", desc: "飯店 → AEON 龜島", tag: "尿布玩具" },
+      const TAIKO_ROUTES = [
+        { title: "最省力路線 (D1/D2晚)", desc: "飯店 → 7-11/Lawson → 回房", tag: "累癱專用" },
+        { title: "超市採買路線 (D7晚)", desc: "飯店 → Donki → MaxValu", tag: "一次搞定" },
+        { title: "兒童用品路線", desc: "飯店 → 走路至 AEON 龜島", tag: "尿布/玩具" },
       ];
 
-      // New data for Taiko Shopping Page
-      const TAIKO_SHOPS_DATA = [
-        { name: "MaxValu 太閤店", dist: "12分", type: "超市", pros: "24 小時營業、種類齊全", note: "最推薦", navLink: "MaxValu Taiko" },
-        { name: "Sun-Ace 龜島店", dist: "11-12分", type: "超市", pros: "價格最低、在地化", note: "非 24 小時", navLink: "Sun-Ace Kamejima" },
-        { name: "Donki 名站西店", dist: "6分", type: "平價百貨", pros: "零食＋藥妝最方便", note: "必列 (至凌晨)", navLink: "Don Quijote Nagoya Station West" },
-        { name: "Sugi Drug (スギ薬局)", dist: "5分", type: "藥妝店", pros: "價格比松本清低", note: "補奶粉/濕紙巾", navLink: "Sugi Drug Nagoya Station West" },
-        { name: "松本清 名古屋西口店", dist: "6分", type: "藥妝店", pros: "爆品完整", note: "感冒藥/腸胃藥", navLink: "Matsumoto Kiyoshi Nagoya Station West" },
-        { name: "AEON 龜島", dist: "15分", type: "購物中心", pros: "兒童用品、玩具多", note: "最後補貨", navLink: "Aeon Mall Nagoya Noritake Garden" },
-        { name: "7-11/Lawson/FM", dist: "1-3分", type: "便利商店", pros: "最快速補給", note: "", navLink: "Convenience Store near Daiwa Roynet Hotel Nagoya Taiko dori Side" },
+      const DONKI_MUST_BUY = [
+        { category: "🥇【1】零食 (1F)", items: ["麵包超人餅乾盒 (送禮)", "麵包超人果凍杯", "じゃがりこ (薯條杯)", "明治巧克力小盒", "抹茶夾心餅 (特價)"] },
+        { category: "🍲【2】即食 (1F/2F)", items: ["S&B 金牌咖哩 (甘口)", "日清烏龍麵杯 (溫和)", "味噌湯組合包 (10入)"] },
+        { category: "💊【3】藥妝 (2F)", items: ["Rohto 眼藥水 V5", "Rohto 金色眼藥水", "PAIR 祛痘膏", "AD/Muhi 止癢乳液", "小孩退熱貼 (必買)"] },
+        { category: "🧸【4】兒童 (3F)", items: ["入浴球 (驚喜玩具)", "麵包超人牙刷 3入組"] }
       ];
 
-      const TAIKO_ROUTES_DATA = [
-        { title: "最省力路線 (D1、D2 晚上)", path: "飯店 → 7-11/Lawson → 回房間", desc: "適合長途飛行後或樂園日後，不想走太遠時。", tag: "累癱專用" },
-        { title: "超市採買路線 (D7 晚上)", path: "飯店 → Donki → MaxValu", desc: "步行 6-12 分鐘，一次搞定全部生活用品、零食和隔日早餐。", tag: "補貨專用" },
-        { title: "兒童用品採購路線", path: "飯店 → AEON 龜島", desc: "兒童用品（玩具、保暖衣物、大量尿布）充足。", tag: "爸媽必看" },
-      ];
+      // --- COMPONENTS ---
 
-      const DONKI_LIST_DATA = [
-        { 
-          category: "🥇【1】零食 (1F 區域)", 
-          items: ["麵包超人餅乾盒 (兒童必買)", "麵包超人果凍杯 (可短暫常溫)", "じゃがりこ (奶油起司/沙拉)", "明治巧克力小盒", "抹茶夾心餅 (榮店常有特價)"] 
-        },
-        { 
-          category: "🍲【2】即食料理 (1F/2F 區域)", 
-          items: ["S&B 金牌咖哩 (甘口/中辛)", "日清烏龍麵杯 (孩子口味溫和)", "味噌湯組合包 (10 入輕巧版)"] 
-        },
-        { 
-          category: "💊【3】藥妝保健 (2F 區域)", 
-          items: ["Rohto 眼藥水 V5 (工作族熱銷)", "Rohto 金色眼藥水 (疲勞專用)", "PAIR 祛痘膏 (穩定好用)", "AD EX/Muhi 止癢乳液", "小孩退熱貼 (買回台最划算)"] 
-        },
-        { 
-          category: "🧸【4】兒童用品 (3F 區域)", 
-          items: ["入浴球 (泡澡驚喜球)", "麵包超人牙刷 3 入組"] 
-        }
-      ];
-
-      const FOOD_APPENDIX_DATA = [
-        {
-          day: "D1",
-          title: "抵達名古屋・名站晚餐",
-          items: [
-            { name: "味仙 名古屋站前店", cat: "晚餐", feat: ["台式拉麵", "炒飯", "可不辣"], cost: "¥1,000-¥1,800", time: "21:30-22:30", primary: true },
-            { name: "世界の山ちゃん 名駅店", cat: "晚餐", feat: ["炸雞翅", "串燒", "居酒屋風"], cost: "¥1,200-¥2,000", time: "21:30-22:30" }
-          ]
-        },
-        {
-          day: "D2",
-          title: "LEGOLAND Japan 親子樂園日",
-          items: [
-            { name: "Brick House Burger (園內)", cat: "午餐", feat: ["樂高造型漢堡", "薯條套餐"], cost: "¥1,200-¥1,800", time: "11:00-12:00", primary: true },
-            { name: "Coral Reef Pizza (園內)", cat: "午餐", feat: ["披薩", "義大利麵", "吃到飽"], cost: "¥1,800-¥2,200", time: "11:30-13:00" },
-            { name: "Chicken Diner (園內)", cat: "午餐", feat: ["炸雞", "兒童套餐"], cost: "¥1,000-¥1,500", time: "11:30-12:30" },
-            { name: "まるは食堂 名古屋港店", cat: "晚餐", feat: ["炸蝦定食", "海景座位"], cost: "¥1,500-¥2,500", time: "18:00-19:00" },
-            { name: "天むす 千壽 JR高島屋店", cat: "伴手", feat: ["炸蝦飯糰", "外帶方便"], cost: "¥600-¥1,000", time: "18:30-19:30", primary: true }
-          ]
-        },
-        {
-          day: "D3",
-          title: "白川鄉・高山老街一日遊",
-          items: [
-            { name: "味の与平 (高山)", cat: "午餐", feat: ["飛驒牛鐵板", "陶板燒"], cost: "¥2,500-¥3,500", time: "12:00-13:00" },
-            { name: "飛騨牛飯 匠家 (高山)", cat: "午餐", feat: ["飛驒牛丼", "炙壽司"], cost: "¥1,800-¥2,300", time: "12:00-13:00", primary: true },
-            { name: "丸明 高山安川店", cat: "午餐", feat: ["A5飛驒牛燒肉", "牛排"], cost: "¥2,800-¥4,500", time: "12:30-13:30", primary: true },
-            { name: "金乃こって牛", cat: "小吃", feat: ["飛驒牛壽司三貫"], cost: "¥1,200-¥1,500", time: "12:00-13:30" },
-            { name: "ぜん助", cat: "小吃", feat: ["飛驒牛串", "五平餅"], cost: "¥300-¥700", time: "12:00-13:30" }
-          ]
-        },
-        {
-          day: "D4",
-          title: "吉卜力公園・AEON 長久手",
-          items: [
-            { name: "風之谷 Café (園內)", cat: "午餐", feat: ["咖哩飯", "三明治", "限定甜點"], cost: "¥1,000-¥1,800", time: "11:30-12:30", primary: true },
-            { name: "AEON 長久手 美食街", cat: "午餐", feat: ["拉麵", "壽司", "甜點"], cost: "¥1,000-¥2,000", time: "13:00-15:00" },
-            { name: "味仙 名古屋站前店", cat: "晚餐", feat: ["台式拉麵", "炒飯", "可不辣"], cost: "¥1,000-¥1,800", time: "18:00-19:00" },
-            { name: "世界の山ちゃん 名駅店", cat: "晚餐", feat: ["炸雞翅", "串燒"], cost: "¥1,200-¥2,000", time: "18:00-19:00" }
-          ]
-        },
-        {
-          day: "D5",
-          title: "三井 Outlet Park + 名花之里",
-          items: [
-            { name: "Italian Kitchen VANSAN", cat: "午餐", feat: ["義大利麵", "披薩", "親子友善"], cost: "¥1,200-¥2,000", time: "12:00-13:30", primary: true },
-            { name: "まるは食堂 長島店", cat: "午餐", feat: ["炸蝦定食", "白飯可續"], cost: "¥1,500-¥2,500", time: "12:00-13:30" },
-            { name: "矢場とん 長島店", cat: "午餐", feat: ["味噌炸豬排", "可選兒童餐"], cost: "¥1,500-¥2,000", time: "12:30-14:00", primary: true },
-            { name: "名花之里 Café", cat: "下午茶", feat: ["燈會限定甜點", "熱飲"], cost: "¥800-¥1,500", time: "15:30-16:30" },
-            { name: "まるは食堂 中部機場店", cat: "晚餐", feat: ["炸蝦定食", "海景座位"], cost: "¥1,500-¥3,000", time: "20:30-21:30" },
-            { name: "星乃珈琲店 機場店", cat: "晚餐", feat: ["鬆餅", "焗飯", "咖啡"], cost: "¥1,000-¥1,800", time: "20:30-21:30" }
-          ]
-        },
-        {
-          day: "D6",
-          title: "牧歌之里・溫泉體驗日",
-          items: [
-            { name: "ふる里亭 (牧歌の里)", cat: "午餐", feat: ["牛奶鍋", "咖哩飯", "飛驒牛"], cost: "¥1,200-¥2,000", time: "12:00-13:00", primary: true },
-            { name: "レストラン まきばの館", cat: "午餐", feat: ["洋食", "漢堡排", "甜點"], cost: "¥1,000-¥1,800", time: "12:00-13:00" },
-            { name: "牧華溫泉 (まきばの湯)", cat: "休息", feat: ["輕食", "飲料", "自販機"], cost: "-", time: "15:00-16:30" },
-            { name: "世界の山ちゃん 名駅店", cat: "晚餐", feat: ["炸雞翅", "串燒"], cost: "¥1,200-¥2,000", time: "19:00-20:00" },
-            { name: "味仙 名古屋站前店", cat: "晚餐", feat: ["台式拉麵", "炒飯"], cost: "¥1,000-¥1,800", time: "19:00-20:00" }
-          ]
-        },
-        {
-          day: "D7",
-          title: "科學館・大須商店街",
-          items: [
-            { name: "喫茶リッチ (Kissa Ritchi)", cat: "早餐", feat: ["名古屋早餐", "吐司套餐"], cost: "¥800-¥1,200", time: "08:00-09:00" },
-            { name: "サガミ 栄店", cat: "午餐", feat: ["烏龍麵", "味噌豬排定食"], cost: "¥1,200-¥1,800", time: "12:00-13:00" },
-            { name: "コメダ珈琲 栄科學館前", cat: "午餐", feat: ["咖啡", "三明治", "甜點"], cost: "¥800-¥1,500", time: "12:00-13:30" },
-            { name: "しら河 栄ガスビル店", cat: "晚餐", feat: ["鰻魚三吃", "清爽", "孩子友善"], cost: "¥3,000-¥4,000", time: "17:30-19:00", primary: true },
-            { name: "ひつまぶし備長", cat: "晚餐", feat: ["高島屋", "出餐快"], cost: "¥3,000-¥4,500", time: "17:30-19:00", primary: true }
-          ]
-        },
-        {
-          day: "D8",
-          title: "回程日 (中部國際機場)",
-          items: [
-            { name: "若草咖啡廳", cat: "早餐", feat: ["吐司", "蛋沙拉", "咖啡"], cost: "¥800-¥1,200", time: "07:00-08:00" },
-            { name: "矢場とん 中部機場店", cat: "午餐", feat: ["味噌炸豬排", "出餐快"], cost: "¥1,500-¥2,000", time: "10:00-11:00" },
-            { name: "まるは食堂 中部機場店", cat: "午餐", feat: ["炸蝦定食", "海景座位"], cost: "¥1,500-¥3,000", time: "10:00-11:00" }
-          ]
-        }
-      ];
-
-      const getWeatherIcon = (iconName) => {
-        switch (iconName) {
-          case 'sun': return <Sun className="w-8 h-8 text-orange-400" />;
-          case 'cloud': return <Cloud className="w-8 h-8 text-gray-400" />;
-          case 'snow': return <Snowflake className="w-8 h-8 text-blue-300" />;
-          case 'rain': return <CloudRain className="w-8 h-8 text-blue-500" />;
-          default: return <Sun className="w-8 h-8 text-orange-400" />;
-        }
+      const openGoogleMaps = (location) => {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
       };
 
-      // --- Helper Components ---
-
-      const Tag = ({ children, color = 'green' }) => {
-        const colorClasses = {
-          green: 'bg-ghibli-green/10 text-ghibli-green border-ghibli-green/20',
-          orange: 'bg-orange-100 text-orange-700 border-orange-200',
-          blue: 'bg-blue-50 text-blue-700 border-blue-200',
-          purple: 'bg-purple-50 text-purple-700 border-purple-200',
-        };
-        return (
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${colorClasses[color]} mr-1 mb-1 inline-flex items-center`}>
-            {children}
-          </span>
-        );
-      };
-
-      const Card = ({ children, className = "" }) => (
-        <div className={`bg-white rounded-2xl shadow-sm p-4 ${className}`}>
-          {children}
+      const DayCard = ({ day, onClick }) => (
+        <div 
+          onClick={onClick}
+          className="bg-white rounded-xl shadow-sm border border-ghibli-cream/50 overflow-hidden active:scale-[0.98] transition-all duration-200"
+        >
+          <div className="bg-ghibli-green/10 p-3 flex justify-between items-center">
+            <span className="font-bold text-ghibli-green text-lg">{day.dateLabel}</span>
+            <div className="flex items-center text-xs text-gray-500 gap-1">
+              {day.weather.icon === 'sun' ? <Sun size={14} className="text-orange-400" /> : 
+               day.weather.icon === 'cloud' ? <Cloud size={14} className="text-gray-400" /> :
+               day.weather.icon === 'snow' ? <Snowflake size={14} className="text-blue-300" /> : null}
+              {day.weather.temp}
+            </div>
+          </div>
+          <div className="p-3">
+            <h3 className="font-bold text-gray-800 mb-2 truncate">{day.title}</h3>
+            <div className="flex flex-wrap gap-1">
+              {day.highlights.slice(0, 3).map((h, i) => (
+                <span key={i} className="text-[10px] bg-ghibli-cream px-2 py-1 rounded-full text-ghibli-brown">
+                  {h}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       );
 
-      // --- Currency Converter Component ---
-      const CurrencyConverter = () => {
-        const [rate, setRate] = useState(0.215); // 近期平均匯率
-        const [amount, setAmount] = useState('');
-        const [loading, setLoading] = useState(false);
-        const [lastTime, setLastTime] = useState('');
-
-        useEffect(() => {
-          fetchRate();
-        }, []);
-
-        const fetchRate = () => {
-          setLoading(true);
-          // 使用免費公開 API (Base: JPY)
-          fetch('https://api.exchangerate-api.com/v4/latest/JPY')
-            .then(res => res.json())
-            .then(data => {
-              if (data && data.rates && data.rates.TWD) {
-                setRate(data.rates.TWD);
-                const now = new Date();
-                setLastTime(`${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`);
-              }
-            })
-            .catch(err => console.error("Rate fetch error", err))
-            .finally(() => setLoading(false));
-        };
-
-        const twd = amount ? Math.floor(parseFloat(amount) * rate) : 0;
-
-        return (
-          <div className="px-4">
-            <Card className="border-l-4 border-yellow-400 bg-gradient-to-br from-white to-yellow-50/30">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="flex items-center gap-2 font-bold text-yellow-800">
-                  <Coins size={20} className="text-yellow-600" /> 即時匯率換算
-                </h3>
-                <button 
-                  onClick={fetchRate}
-                  className={`p-1.5 rounded-full bg-white text-yellow-600 shadow-sm border border-yellow-100 active:scale-95 transition-all ${loading ? 'animate-spin' : ''}`}
-                >
-                  <RefreshCw size={14} />
-                </button>
+      const DayDetailView = ({ day, onBack }) => (
+        <div className="animate-fade-in pb-24">
+          <div className="bg-ghibli-green text-white p-4 sticky top-0 z-20 shadow-md">
+            <button onClick={onBack} className="flex items-center gap-1 mb-2 opacity-80 hover:opacity-100">
+              <ChevronLeft size={20} /> 返回行程
+            </button>
+            <div className="flex justify-between items-end">
+              <h1 className="text-2xl font-bold">{day.dateLabel} {day.title}</h1>
+              <div className="text-right">
+                <div className="text-3xl">{day.weather.icon === 'sun' ? '☀️' : day.weather.icon === 'cloud' ? '☁️' : '❄️'}</div>
+                <div className="text-sm opacity-90">{day.weather.temp}</div>
               </div>
-
-              <div className="bg-white rounded-xl p-3 border border-yellow-100 shadow-sm mb-4 flex justify-between items-center">
-                 <div>
-                    <div className="text-[10px] text-gray-500 font-bold tracking-wider mb-0.5">目前匯率 (JPY)</div>
-                    <div className="font-mono font-bold text-xl text-yellow-600">
-                      0.{rate.toString().split('.')[1]?.substring(0,4) || '2150'}
-                    </div>
-                 </div>
-                 <div className="text-right">
-                    <div className="text-[10px] text-gray-400">1 JPY ≈ {rate} TWD</div>
-                    <div className="text-[10px] text-gray-400">1 TWD ≈ {(1/rate).toFixed(2)} JPY</div>
-                    {lastTime && <div className="text-[10px] text-gray-300 mt-0.5">更新於 {lastTime}</div>}
-                 </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <label className="text-[10px] font-bold text-gray-400 mb-1 block ml-1">日幣 (JPY)</label>
-                  <input 
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="¥"
-                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold font-mono text-gray-700 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-50 transition-all placeholder:text-gray-300"
-                  />
-                </div>
-                <ArrowRightLeft className="text-yellow-300 mt-5 shrink-0" size={20} />
-                <div className="flex-1">
-                  <label className="text-[10px] font-bold text-gray-400 mb-1 block ml-1">台幣 (TWD)</label>
-                  <div className="w-full bg-yellow-100/50 border border-yellow-200 rounded-xl px-3 py-2 text-lg font-bold font-mono text-yellow-800 h-[46px] flex items-center">
-                    ${twd.toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </Card>
+            </div>
           </div>
-        );
-      };
 
-      // --- Tools View ---
+          <div className="p-4 space-y-6">
+            <section>
+              <h2 className="text-lg font-bold text-ghibli-green mb-3 flex items-center gap-2">
+                <Clock size={18} /> 時間軸
+              </h2>
+              <div className="space-y-4 border-l-2 border-ghibli-green/20 ml-2 pl-4">
+                {day.schedule.map((item, idx) => (
+                  <div key={idx} className="relative">
+                    <div className={`absolute -left-[21px] top-1 w-3 h-3 rounded-full ${item.important ? 'bg-red-400 animate-pulse' : 'bg-ghibli-green'}`}></div>
+                    <div className="flex items-baseline justify-between">
+                      <span className="font-mono text-ghibli-green font-bold">{item.time}</span>
+                      {item.navLink && (
+                        <button onClick={() => openGoogleMaps(item.navLink)} className="text-blue-500 text-xs flex items-center gap-1">
+                          <Navigation size={12} /> 導航
+                        </button>
+                      )}
+                    </div>
+                    <h3 className="font-bold text-gray-800">{item.title}</h3>
+                    <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                    {item.important && (
+                      <div className="mt-2 bg-red-50 text-red-600 text-xs p-2 rounded flex items-start gap-1">
+                        <AlertCircle size={12} className="mt-0.5 shrink-0" />
+                        {item.important}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-ghibli-orange mb-3 flex items-center gap-2">
+                <Utensils size={18} /> 餐飲推薦
+              </h2>
+              <div className="grid gap-3">
+                {day.food.map((f, idx) => (
+                  <div key={idx} className={`p-3 rounded-lg border ${f.isPrimary ? 'bg-white border-ghibli-orange/30 shadow-sm' : 'bg-gray-50 border-transparent'}`}>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-gray-800">{f.name}</span>
+                          <span className="text-xs text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded">{f.type}</span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">{f.price}</div>
+                        <div className="flex gap-1 mt-2">
+                          {f.features.map((tag, i) => (
+                            <span key={i} className="text-[10px] px-1.5 py-0.5 rounded border border-ghibli-orange/30 text-ghibli-orange">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      {f.navLink && (
+                        <button onClick={() => openGoogleMaps(f.navLink)} className="p-2 bg-blue-50 text-blue-500 rounded-full">
+                          <Navigation size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="bg-ghibli-cream/50 p-4 rounded-xl">
+              <h2 className="text-lg font-bold text-ghibli-brown mb-2 flex items-center gap-2">
+                <Info size={18} /> 親子小貼士
+              </h2>
+              <ul className="space-y-2">
+                {day.tips.map((tip, idx) => (
+                  <li key={idx} className="text-sm text-gray-700 flex gap-2">
+                    <span className="text-ghibli-green">•</span> {tip}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        </div>
+      );
 
       const ToolsView = () => {
+        const [checklist, setChecklist] = useState({
+          passport: false, license: false, insurance: false, 
+          clothes: false, medicine: false, charger: false,
+          cash: false, credit: false
+        });
+
+        const toggleCheck = (key) => setChecklist(prev => ({...prev, [key]: !prev[key]}));
+
         const budgetData = [
-          { name: '機票', value: 45000 },
-          { name: '住宿', value: 35000 },
-          { name: '交通', value: 10000 },
-          { name: '飲食', value: 20000 },
-          { name: '購物', value: 15000 },
+          { name: '交通', value: 30000, color: '#4a6c48' },
+          { name: '住宿', value: 45000, color: '#e89e70' },
+          { name: '餐飲', value: 35000, color: '#7da6bd' },
+          { name: '購物', value: 50000, color: '#f4a261' },
         ];
-        const COLORS = ['#8da38b', '#e89e70', '#5c4839', '#7da6bd', '#f4a261'];
 
         return (
-          <div className="space-y-6 pb-24">
-            <h2 className="text-2xl font-bold text-ghibli-brown px-4 pt-4">旅遊工具箱</h2>
+          <div className="p-4 space-y-6 pb-24 animate-fade-in">
+            <h1 className="text-2xl font-bold text-ghibli-brown mb-4">旅遊工具箱</h1>
             
-            {/* Currency Converter Removed from here, moved to dedicated page */}
-            
-            <div className="px-4 grid grid-cols-2 gap-4">
-              <Card className="flex flex-col items-center justify-center py-6 gap-2">
-                  <Plane className="w-8 h-8 text-ghibli-green" />
-                  <span className="font-bold text-ghibli-brown">航班資訊</span>
-                  <span className="text-xs text-gray-500">去: 17:15 | 回: 09:50</span>
-              </Card>
-              <Card className="flex flex-col items-center justify-center py-6 gap-2">
-                  <Bed className="w-8 h-8 text-ghibli-orange" />
-                  <span className="font-bold text-ghibli-brown">住宿飯店</span>
-                  <span className="text-xs text-gray-500">Daiwa Roynet / Comfort</span>
-              </Card>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-3">
+                <Plane size={18} className="text-blue-500" /> 航班資訊
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span>去程 (D1)</span>
+                  <span className="font-mono font-bold">17:15 → 20:50</span>
+                </div>
+                <div className="flex justify-between p-2 bg-gray-50 rounded">
+                  <span>回程 (D8)</span>
+                  <span className="font-mono font-bold">09:50 → 12:15</span>
+                </div>
+              </div>
             </div>
 
-            {/* Pre-trip Card */}
-            <div className="px-4">
-              <Card className="border-l-4 border-indigo-400">
-                  <h3 className="flex items-center gap-2 font-bold text-indigo-600 mb-3">
-                      <ClipboardCheck size={20} /> 行前檢查與準備
-                  </h3>
-                  <div className="space-y-3 text-sm">
-                      <div>
-                          <h4 className="font-bold text-ghibli-brown flex items-center gap-1.5 mb-1">
-                            <span className="bg-indigo-100 p-1 rounded-full text-indigo-600"><CheckCircle size={12}/></span> 
-                            證件與網卡
-                          </h4>
-                          <ul className="list-disc list-inside text-xs space-y-1 text-gray-600 pl-1">
-                              <li>檢查護照效期 (需 &gt; 6 個月)</li>
-                              <li>填寫 Visit Japan Web (入境/海關) 並截圖 QR Code</li>
-                              <li><strong>自駕必備</strong>: 台灣駕照正本 + 日文譯本</li>
-                              <li>購買網卡/開通漫遊 (建議一下飛機即可使用)</li>
-                          </ul>
-                      </div>
-                      <div className="border-t border-gray-100 pt-3">
-                           <h4 className="font-bold text-ghibli-brown flex items-center gap-1.5 mb-1">
-                            <span className="bg-orange-100 p-1 rounded-full text-orange-600"><ShoppingBag size={12}/></span> 
-                            行李打包重點
-                          </h4>
-                          <ul className="list-disc list-inside text-xs space-y-1 text-gray-600 pl-1">
-                              <li>衣物: 洋蔥式穿搭 (戶外冷/室內暖氣強)</li>
-                              <li>藥品: 兒童常備藥 (退燒、止咳、益生菌) & 體溫計</li>
-                              <li>電子: 行動電源 (隨身帶)、充電線、轉接頭(日本兩孔)</li>
-                          </ul>
-                      </div>
-                      <div className="border-t border-gray-100 pt-3">
-                           <h4 className="font-bold text-ghibli-brown flex items-center gap-1.5 mb-1">
-                            <span className="bg-green-100 p-1 rounded-full text-green-600"><Banknote size={12}/></span> 
-                            貨幣建議
-                          </h4>
-                          <p className="text-xs text-gray-600 pl-1">建議每人準備 ¥30,000 現金 (老街/停車/販賣機)，其餘以高回饋信用卡為主。</p>
-                      </div>
-                  </div>
-              </Card>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-3">
+                <ClipboardCheck size={18} className="text-green-500" /> 行前檢查
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  {k: 'passport', l: '護照 (效期6個月+)'}, {k: 'license', l: '駕照日文譯本'},
+                  {k: 'insurance', l: '旅遊保險單'}, {k: 'clothes', l: '洋蔥式衣物'},
+                  {k: 'medicine', l: '常備藥/退熱貼'}, {k: 'charger', l: '充電器/轉接頭'},
+                  {k: 'cash', l: '日幣現金'}, {k: 'credit', l: '信用卡 (海外回饋)'}
+                ].map((item) => (
+                  <button 
+                    key={item.k}
+                    onClick={() => toggleCheck(item.k)}
+                    className={`p-2 rounded text-xs text-left flex items-center gap-2 transition-colors ${checklist[item.k] ? 'bg-green-100 text-green-800' : 'bg-gray-50 text-gray-500'}`}
+                  >
+                    {checklist[item.k] ? <CheckCircle size={14} /> : <div className="w-3.5 h-3.5 rounded-full border border-gray-300" />}
+                    {item.l}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="px-4">
-              <Card className="border-l-4 border-red-400">
-                  <h3 className="flex items-center gap-2 font-bold text-red-500 mb-3">
-                      <AlertCircle size={20} /> 緊急聯絡
-                  </h3>
-                  <div className="space-y-2 text-sm">
-                      <div className="flex justify-between border-b pb-2">
-                          <span>救護車 / 火警</span>
-                          <span className="font-bold font-mono text-lg">119</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                          <span>警察局</span>
-                          <span className="font-bold font-mono text-lg">110</span>
-                      </div>
-                      <div className="pt-2 text-gray-600">
-                          <p>實用日語：</p>
-                          <p>醫院 (Byōin) | 藥局 (Yakkyoku)</p>
-                      </div>
-                  </div>
-              </Card>
-            </div>
-
-            <div className="px-4">
-              <Card>
-                  <h3 className="flex items-center gap-2 font-bold text-ghibli-brown mb-4">
-                      <Wallet size={20} /> 預算概覽 (TWD)
-                  </h3>
-                  <div className="h-64 w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                              <Pie
-                                  data={budgetData}
-                                  cx="50%"
-                                  cy="50%"
-                                  innerRadius={60}
-                                  outerRadius={80}
-                                  paddingAngle={5}
-                                  dataKey="value"
-                              >
-                                  {budgetData.map((entry, index) => (
-                                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                  ))}
-                              </Pie>
-                              <Tooltip formatter={(value) => `$${value}`} />
-                          </PieChart>
-                      </ResponsiveContainer>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mt-4">
-                      {budgetData.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-full" style={{backgroundColor: COLORS[idx]}}></div>
-                              <span>{item.name}: ${item.value.toLocaleString()}</span>
-                          </div>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-3">
+                <Wallet size={18} className="text-orange-500" /> 預算概覽 (TWD)
+              </h3>
+              <div className="h-48 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={budgetData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={60}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {budgetData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex justify-center gap-4 text-xs text-gray-500">
+                {budgetData.map((d, i) => (
+                  <div key={i} className="flex items-center gap-1">
+                    <div className="w-2 h-2 rounded-full" style={{backgroundColor: d.color}} />
+                    {d.name}
                   </div>
-              </Card>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-red-50 p-4 rounded-xl border border-red-100">
+              <h3 className="font-bold text-red-700 flex items-center gap-2 mb-2">
+                <AlertCircle size={18} /> 緊急聯絡
+              </h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <a href="tel:119" className="bg-white p-2 rounded text-center text-red-600 font-bold shadow-sm">
+                  🚑 119 (救護/火警)
+                </a>
+                <a href="tel:110" className="bg-white p-2 rounded text-center text-red-600 font-bold shadow-sm">
+                  👮 110 (警察)
+                </a>
+              </div>
             </div>
           </div>
         );
       };
 
-      // --- Main App Component ---
+      const CurrencyView = () => {
+        const [rate, setRate] = useState(0.215);
+        const [amount, setAmount] = useState('');
+        const [loading, setLoading] = useState(false);
+
+        const fetchRate = async () => {
+          setLoading(true);
+          try {
+            const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
+            const data = await res.json();
+            if (data && data.rates && data.rates.TWD) {
+              setRate(data.rates.TWD);
+            }
+          } catch (e) {
+            console.error("Rate fetch failed", e);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        useEffect(() => { fetchRate(); }, []);
+
+        const calculated = amount ? (parseFloat(amount) * rate).toFixed(0) : 0;
+
+        return (
+          <div className="p-4 space-y-6 pb-24 animate-fade-in">
+             <h1 className="text-2xl font-bold text-ghibli-brown mb-4">匯率換算</h1>
+             <div className="bg-white p-6 rounded-2xl shadow-sm border border-ghibli-green/20 text-center space-y-4">
+               <div className="flex justify-center items-center gap-2 text-gray-500 text-sm">
+                 <span>即時匯率 (JPY → TWD)</span>
+                 <button onClick={fetchRate} disabled={loading} className="p-1 hover:bg-gray-100 rounded-full">
+                   <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                 </button>
+               </div>
+               <div className="text-4xl font-bold text-ghibli-green font-mono">
+                 {rate.toFixed(3)}
+               </div>
+               
+               <div className="bg-gray-50 p-4 rounded-xl flex items-center gap-3 border border-gray-200">
+                 <span className="text-gray-500 font-bold">¥</span>
+                 <input 
+                   type="number" 
+                   value={amount}
+                   onChange={(e) => setAmount(e.target.value)}
+                   placeholder="輸入日幣..."
+                   className="bg-transparent text-2xl font-bold text-gray-800 w-full outline-none placeholder-gray-300"
+                 />
+               </div>
+               
+               <div className="flex items-center justify-center gap-2 text-gray-400">
+                 <ArrowRightLeft size={16} className="rotate-90" />
+               </div>
+
+               <div className="bg-ghibli-green/10 p-4 rounded-xl">
+                 <div className="text-sm text-gray-500 mb-1">約合台幣</div>
+                 <div className="text-3xl font-bold text-ghibli-green">
+                   ${Number(calculated).toLocaleString()}
+                 </div>
+               </div>
+
+               <div className="text-xs text-gray-400 mt-4">
+                 資料來源: <a href="https://www.exchangerate-api.com" target="_blank" className="underline text-blue-400">ExchangeRate-API</a> (國際市場中間價)
+               </div>
+             </div>
+          </div>
+        );
+      };
+
+      const TransportView = ({ onBack }) => (
+        <div className="animate-fade-in pb-24">
+          <div className="bg-blue-600 text-white p-4 sticky top-0 z-20 shadow-md flex items-center gap-2">
+            <button onClick={onBack}><ChevronLeft /></button>
+            <h1 className="text-xl font-bold">交通票券附錄</h1>
+          </div>
+          <div className="p-4 space-y-6">
+            <section>
+              <h2 className="text-lg font-bold text-blue-700 mb-2 flex items-center gap-2">
+                <Ticket size={18} /> 4 歲幼童票券規則
+              </h2>
+              <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-gray-100 text-gray-700">
+                    <tr><th className="p-2">交通方式</th><th className="p-2">需購票?</th><th className="p-2">備註</th></tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-100">
+                    <tr><td className="p-2">地鐵全線</td><td className="p-2 font-bold text-green-600">免票</td><td className="p-2 text-gray-500">不佔位</td></tr>
+                    <tr><td className="p-2">名鐵一般車</td><td className="p-2 font-bold text-green-600">免票</td><td className="p-2 text-gray-500">可共坐</td></tr>
+                    <tr><td className="p-2">名鐵 µSKY</td><td className="p-2 font-bold text-red-500">需票</td><td className="p-2 text-gray-500">若佔指定席</td></tr>
+                    <tr><td className="p-2">巴士團</td><td className="p-2 font-bold text-blue-500">含在團費</td><td className="p-2 text-gray-500">多數含</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-blue-700 mb-2">每日交通總表</h2>
+              <div className="space-y-3">
+                {[
+                  {d:"D1", route:"名鐵 µSKY", ticket:"指定席券", price:"¥1250", color:"bg-red-100 text-red-800"},
+                  {d:"D2", route:"あおなみ線", ticket:"一日券", price:"¥870", color:"bg-blue-100 text-blue-800"},
+                  {d:"D3", route:"KKday 巴士", ticket:"團費包含", price:"-", color:"bg-orange-100 text-orange-800"},
+                  {d:"D4", route:"東山線+Linimo", ticket:"24h券+單程", price:"¥1140", color:"bg-yellow-100 text-yellow-800"},
+                  {d:"D5", route:"名鐵巴士", ticket:"套票", price:"¥3700", color:"bg-purple-100 text-purple-800"},
+                ].map((row, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
+                    <span className="font-bold text-gray-500 w-8">{row.d}</span>
+                    <span className={`text-xs px-2 py-1 rounded ${row.color}`}>{row.route}</span>
+                    <div className="flex-1 text-right text-sm">
+                      <div className="font-bold">{row.ticket}</div>
+                      <div className="text-gray-500 text-xs">{row.price}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        </div>
+      );
+
+      const FoodListView = ({ onBack }) => (
+        <div className="animate-fade-in pb-24">
+          <div className="bg-orange-500 text-white p-4 sticky top-0 z-20 shadow-md flex items-center gap-2">
+            <button onClick={onBack}><ChevronLeft /></button>
+            <h1 className="text-xl font-bold">美食附錄 (完整版)</h1>
+          </div>
+          <div className="p-4 space-y-6">
+            {ITINERARY_DATA.map((day) => (
+              <div key={day.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-orange-50 px-4 py-2 font-bold text-orange-800 text-sm flex justify-between">
+                  <span>{day.dateLabel} {day.title}</span>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  {day.food.map((f, i) => (
+                    <div key={i} className="p-3 flex justify-between items-center">
+                      <div>
+                        <div className="font-bold text-gray-800">{f.name}</div>
+                        <div className="text-xs text-gray-500 mt-1">{f.type} • {f.price}</div>
+                      </div>
+                      <div className="text-xs px-2 py-1 bg-gray-100 rounded text-gray-600">
+                        {f.features[0]}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+      const FullMapView = ({ onBack }) => (
+        <div className="animate-fade-in pb-24">
+          <div className="bg-teal-600 text-white p-4 sticky top-0 z-20 shadow-md flex items-center gap-2">
+            <button onClick={onBack}><ChevronLeft /></button>
+            <h1 className="text-xl font-bold">完整購物地圖</h1>
+          </div>
+          
+          {/* Originally Taiko Shopping Content */}
+          <div className="p-4 space-y-6">
+            <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
+              <p>🛍️ <strong>名古屋站太閤通口</strong> (Daiwa Roynet 飯店周邊) 補給攻略。</p>
+            </div>
+
+            <section>
+              <h2 className="text-lg font-bold text-teal-800 mb-3 flex items-center gap-2">
+                <MapPin size={18} /> 周邊店家列表
+              </h2>
+              <div className="grid gap-3">
+                {TAIKO_SHOPS.map((shop, i) => (
+                  <div key={i} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex justify-between items-start">
+                    <div>
+                      <div className="font-bold text-gray-800 flex items-center gap-2">
+                        {shop.name}
+                        <span className="text-[10px] bg-gray-100 px-1 rounded text-gray-500">{shop.dist}</span>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">{shop.type} • {shop.tag}</div>
+                      <div className="text-xs text-teal-600 mt-1 font-bold">{shop.note}</div>
+                    </div>
+                    <button onClick={() => openGoogleMaps(shop.navLink)} className="p-2 bg-gray-50 rounded-full text-blue-500">
+                      <Navigation size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-bold text-teal-800 mb-3 flex items-center gap-2">
+                <Footprints size={18} /> 推薦補給路線
+              </h2>
+              <div className="space-y-3">
+                {TAIKO_ROUTES.map((route, i) => (
+                  <div key={i} className="bg-white p-3 rounded-lg border-l-4 border-teal-500 shadow-sm">
+                    <div className="flex justify-between">
+                      <h3 className="font-bold text-gray-800">{route.title}</h3>
+                      <span className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full">{route.tag}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">{route.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        </div>
+      );
+
+      const TaikoShoppingView = ({ onBack }) => (
+        <div className="animate-fade-in pb-24">
+          <div className="bg-yellow-500 text-white p-4 sticky top-0 z-20 shadow-md flex items-center gap-2">
+            <button onClick={onBack}><ChevronLeft /></button>
+            <h1 className="text-xl font-bold">太閤通口購物攻略</h1>
+          </div>
+          
+          <div className="p-4 space-y-6">
+            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl">
+              <h2 className="text-lg font-bold text-yellow-800 mb-4 flex items-center gap-2">
+                <Store size={18} /> Donki 榮本店 15 項必買
+              </h2>
+              <div className="space-y-4">
+                {DONKI_MUST_BUY.map((cat, i) => (
+                  <div key={i}>
+                    <h3 className="font-bold text-yellow-900 bg-yellow-200/50 px-2 py-1 rounded mb-2 text-sm">{cat.category}</h3>
+                    <ul className="space-y-2">
+                      {cat.items.map((item, j) => (
+                        <li key={j} className="flex items-center gap-2 text-sm text-gray-700 bg-white p-2 rounded border border-yellow-100 shadow-sm">
+                          <CheckCircle size={14} className="text-yellow-500 shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-xs text-gray-500 bg-white p-2 rounded">
+                 建議順序: 1F(零食) → 2F(藥妝) → 3F(兒童) → 結帳
+              </div>
+            </div>
+
+            <section>
+               <h2 className="text-lg font-bold text-gray-800 mb-2">周邊超市地圖</h2>
+               <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                 {TAIKO_SHOPS.filter(s => s.type === '超市').map((shop, i) => (
+                   <div key={i} className="flex justify-between items-center py-2 border-b last:border-0 border-gray-100">
+                     <div>
+                       <div className="font-bold">{shop.name}</div>
+                       <div className="text-xs text-gray-500">{shop.tag}</div>
+                     </div>
+                     <button onClick={() => openGoogleMaps(shop.navLink)} className="text-blue-500 text-sm">導航</button>
+                   </div>
+                 ))}
+               </div>
+            </section>
+          </div>
+        </div>
+      );
+
+      const BottomNav = ({ activeTab, onTabChange }) => (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md border border-gray-200 shadow-2xl rounded-full px-6 py-3 flex items-center gap-8 z-50">
+          <button 
+            onClick={() => onTabChange('HOME')}
+            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'HOME' ? 'text-ghibli-green scale-110' : 'text-gray-400'}`}
+          >
+            <Calendar size={24} />
+            <span className="text-[10px] font-bold">行程</span>
+          </button>
+          <div className="w-px h-8 bg-gray-200"></div>
+          <button 
+            onClick={() => onTabChange('CURRENCY')}
+            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'CURRENCY' ? 'text-blue-500 scale-110' : 'text-gray-400'}`}
+          >
+            <Banknote size={24} />
+            <span className="text-[10px] font-bold">匯率</span>
+          </button>
+          <div className="w-px h-8 bg-gray-200"></div>
+          <button 
+            onClick={() => onTabChange('TOOLS')}
+            className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'TOOLS' ? 'text-ghibli-orange scale-110' : 'text-gray-400'}`}
+          >
+            <Wallet size={24} />
+            <span className="text-[10px] font-bold">工具</span>
+          </button>
+        </div>
+      );
 
       const App = () => {
         const [activeTab, setActiveTab] = useState('HOME');
         const [selectedDayId, setSelectedDayId] = useState(null);
+        const [view, setView] = useState('MAIN'); // MAIN, TRANSPORT, FOOD, FULL_MAP, TAIKO_SHOPPING
 
-        const selectedDay = ITINERARY_DATA.find(d => d.id === selectedDayId);
+        const handleTabChange = (tab) => {
+          setActiveTab(tab);
+          if (tab !== 'HOME') {
+            setSelectedDayId(null);
+            setView('MAIN');
+          }
+        };
 
-        useEffect(() => {
-          window.scrollTo(0, 0);
-        }, [selectedDayId, activeTab]);
+        const renderHome = () => {
+          if (view === 'TRANSPORT') return <TransportView onBack={() => setView('MAIN')} />;
+          if (view === 'FOOD') return <FoodListView onBack={() => setView('MAIN')} />;
+          if (view === 'FULL_MAP') return <FullMapView onBack={() => setView('MAIN')} />;
+          if (view === 'TAIKO_SHOPPING') return <TaikoShoppingView onBack={() => setView('MAIN')} />;
+          
+          if (selectedDayId) {
+            const day = ITINERARY_DATA.find(d => d.id === selectedDayId);
+            return <DayDetailView day={day} onBack={() => setSelectedDayId(null)} />;
+          }
 
-        const handleNavClick = (url) => {
-          if (!url) return;
-          const query = encodeURIComponent(url);
-          window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+          return (
+            <div className="p-4 space-y-6 pb-24 animate-fade-in">
+              <header className="flex justify-between items-center mb-2">
+                <div>
+                  <h1 className="text-2xl font-bold text-ghibli-green">名古屋親子遊</h1>
+                  <p className="text-sm text-gray-500">8 天 7 夜自駕行程</p>
+                </div>
+                <div className="bg-ghibli-cream px-3 py-1 rounded-full text-xs font-bold text-ghibli-brown">
+                  2024
+                </div>
+              </header>
+
+              <div className="grid grid-cols-2 gap-3">
+                {ITINERARY_DATA.map(day => (
+                  <DayCard key={day.id} day={day} onClick={() => setSelectedDayId(day.id)} />
+                ))}
+              </div>
+
+              <section>
+                <h2 className="text-lg font-bold text-gray-700 mb-3 ml-1">實用附錄</h2>
+                <div className="space-y-3">
+                  <div onClick={() => setView('TRANSPORT')} className="bg-white p-4 rounded-xl shadow-sm border border-blue-100 flex items-center gap-4 active:scale-95 transition-transform">
+                    <div className="bg-blue-100 p-3 rounded-full text-blue-600"><Ticket size={24} /></div>
+                    <div>
+                      <h3 className="font-bold text-gray-800">交通票券</h3>
+                      <p className="text-xs text-gray-500">幼童規則、每日票券總覽</p>
+                    </div>
+                    <ChevronLeft className="ml-auto rotate-180 text-gray-300" />
+                  </div>
+                  
+                  <div onClick={() => setView('FOOD')} className="bg-white p-4 rounded-xl shadow-sm border border-orange-100 flex items-center gap-4 active:scale-95 transition-transform">
+                    <div className="bg-orange-100 p-3 rounded-full text-orange-600"><Utensils size={24} /></div>
+                    <div>
+                      <h3 className="font-bold text-gray-800">美食附錄</h3>
+                      <p className="text-xs text-gray-500">完整表格版 (含建議時段)</p>
+                    </div>
+                    <ChevronLeft className="ml-auto rotate-180 text-gray-300" />
+                  </div>
+
+                  <div onClick={() => setView('FULL_MAP')} className="bg-white p-4 rounded-xl shadow-sm border border-teal-100 flex items-center gap-4 active:scale-95 transition-transform">
+                    <div className="bg-teal-100 p-3 rounded-full text-teal-600"><Map size={24} /></div>
+                    <div>
+                      <h3 className="font-bold text-gray-800">完整購物地圖</h3>
+                      <p className="text-xs text-gray-500">超市＋藥妝＋平價店清單</p>
+                    </div>
+                    <ChevronLeft className="ml-auto rotate-180 text-gray-300" />
+                  </div>
+
+                  <div onClick={() => setView('TAIKO_SHOPPING')} className="bg-white p-4 rounded-xl shadow-sm border border-yellow-100 flex items-center gap-4 active:scale-95 transition-transform">
+                    <div className="bg-yellow-100 p-3 rounded-full text-yellow-600"><ShoppingBag size={24} /></div>
+                    <div>
+                      <h3 className="font-bold text-gray-800">太閤通口購物</h3>
+                      <p className="text-xs text-gray-500">Donki 懶人包 & 補給攻略</p>
+                    </div>
+                    <ChevronLeft className="ml-auto rotate-180 text-gray-300" />
+                  </div>
+                </div>
+              </section>
+            </div>
+          );
         };
 
         return (
-          <div className="min-h-screen pb-20 max-w-md mx-auto bg-ghibli-cream shadow-2xl relative overflow-hidden">
-            
-            {/* Detail View */}
-            {activeTab === 'HOME' && selectedDay && (
-              <div className="animate-fade-in pb-24">
-                <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
-                  <button 
-                    onClick={() => setSelectedDayId(null)}
-                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
-                  >
-                    <ChevronLeft className="text-ghibli-brown" />
-                  </button>
-                  <div>
-                    <div className="text-xs font-bold text-ghibli-green uppercase tracking-wider">{selectedDay.dateLabel}</div>
-                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">{selectedDay.title}</h1>
-                  </div>
-                </div>
-
-                <div className="m-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl flex items-center justify-between shadow-sm">
-                  <div className="flex flex-col">
-                      <span className="text-xs text-gray-500 mb-1">今日天氣預報</span>
-                      <span className="text-2xl font-bold text-ghibli-brown">{selectedDay.weather.temp}</span>
-                      <span className="text-sm text-gray-600">{selectedDay.weather.condition}</span>
-                  </div>
-                  <div>
-                      {getWeatherIcon(selectedDay.weather.icon)}
-                  </div>
-                </div>
-
-                <div className="px-4 mb-8">
-                  <h2 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-widest">今日行程</h2>
-                  <div className="space-y-0 relative border-l-2 border-dashed border-ghibli-greenLight/30 ml-3">
-                    {selectedDay.schedule.map((item, idx) => (
-                      <div key={idx} className="pl-6 pb-8 relative group">
-                        <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-white shadow-sm
-                          ${item.type === 'transport' ? 'bg-blue-300' : 
-                            item.type === 'food' ? 'bg-orange-300' : 
-                            item.type === 'shopping' ? 'bg-purple-300' : 'bg-ghibli-green'}
-                        `}></div>
-                        
-                        <div className="flex justify-between items-start">
-                          <span className="text-xs font-mono font-bold text-ghibli-greenLight bg-white px-1 rounded mb-1 inline-block">{item.time}</span>
-                          {item.navLink && (
-                              <button onClick={() => handleNavClick(item.navLink)} className="text-xs text-blue-500 flex items-center gap-0.5">
-                                  <Navigation size={12} /> 導航
-                              </button>
-                          )}
-                        </div>
-                        
-                        <h3 className="font-bold text-ghibli-brown text-lg">{item.title}</h3>
-                        {item.description && <p className="text-sm text-gray-600 mt-1">{item.description}</p>}
-                        
-                        {item.important && (
-                          <div className="mt-2 bg-red-50 text-red-600 text-xs px-2 py-1.5 rounded-lg border border-red-100 flex items-start gap-1.5">
-                              <AlertCircle size={14} className="mt-0.5 shrink-0" />
-                              <span>{item.important}</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="px-4 mb-8">
-                  <h2 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-widest flex items-center gap-2">
-                      <Utensils size={16} /> 美食推薦
-                  </h2>
-                  <div className="grid gap-4">
-                      {selectedDay.food.map((food, idx) => (
-                          <Card key={idx} className={food.isPrimary ? "border-2 border-orange-100" : ""}>
-                              <div className="flex justify-between items-start mb-2">
-                                  <div>
-                                      <h4 className="font-bold text-ghibli-brown text-lg">{food.name}</h4>
-                                      <div className="text-xs text-gray-500">{food.type} • {food.price}</div>
-                                  </div>
-                                  {food.navLink && (
-                                      <button onClick={() => handleNavClick(food.navLink)} className="bg-blue-50 p-2 rounded-full text-blue-500">
-                                          <Navigation size={16} />
-                                      </button>
-                                  )}
-                              </div>
-                              <div className="flex flex-wrap gap-2 mt-3">
-                                  {food.features.map((feat, fidx) => (
-                                      <Tag key={fidx} color={food.isPrimary ? 'orange' : 'green'}>{feat}</Tag>
-                                  ))}
-                              </div>
-                          </Card>
-                      ))}
-                  </div>
-                </div>
-
-                <div className="px-4 mb-8">
-                  <div className="bg-ghibli-green/5 rounded-2xl p-5 border border-ghibli-green/10">
-                      <h3 className="font-bold text-ghibli-green mb-3 flex items-center gap-2">
-                          <Info size={18} /> 親子小貼士
-                      </h3>
-                      <ul className="space-y-2">
-                          {selectedDay.tips.map((tip, idx) => (
-                              <li key={idx} className="text-sm text-ghibli-brown/80 flex gap-2">
-                                  <span className="text-ghibli-green">•</span>
-                                  {tip}
-                              </li>
-                          ))}
-                      </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Home Grid View */}
-            {activeTab === 'HOME' && !selectedDay && (
-              <div className="animate-fade-in pb-24">
-                <header className="px-6 pt-10 pb-6">
-                  <h1 className="text-3xl font-bold text-ghibli-brown">名古屋</h1>
-                  <p className="text-ghibli-green text-lg">8 天 7 夜 親子自駕遊</p>
-                </header>
-
-                <div className="px-4 grid grid-cols-2 gap-3">
-                  {ITINERARY_DATA.map((day) => (
-                    <button 
-                      key={day.id}
-                      onClick={() => setSelectedDayId(day.id)}
-                      className="bg-white p-4 rounded-2xl shadow-sm border border-transparent hover:border-ghibli-orange/30 hover:shadow-md transition-all text-left flex flex-col h-full"
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                          <span className="bg-ghibli-brown text-ghibli-cream text-xs font-bold px-2 py-1 rounded-md">{day.dateLabel}</span>
-                          <div className="opacity-50 scale-75 origin-right">{getWeatherIcon(day.weather.icon)}</div>
-                      </div>
-                      <h3 className="font-bold text-ghibli-brown text-sm mb-1 leading-snug">{day.title}</h3>
-                      <div className="mt-auto pt-2 flex flex-wrap gap-1">
-                          {day.highlights.slice(0, 2).map((h, i) => (
-                              <span key={i} className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">{h}</span>
-                          ))}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mt-8 px-6">
-                  <div className="bg-gradient-to-br from-ghibli-green to-emerald-800 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
-                      <div className="relative z-10">
-                          <h3 className="font-bold text-lg mb-1">旅行小幫手</h3>
-                          <p className="text-white/80 text-sm mb-4">查看航班、預算與緊急資訊</p>
-                          <button 
-                              onClick={() => setActiveTab('TOOLS')}
-                              className="bg-white/20 hover:bg-white/30 backdrop-blur-md px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors"
-                          >
-                              打開工具箱 <ArrowRight size={16} />
-                          </button>
-                      </div>
-                      <Plane className="absolute -right-4 -bottom-4 text-white/10 w-32 h-32 rotate-12" />
-                  </div>
-                </div>
-
-                {/* Appendix Section */}
-                <div className="mt-6 px-6 pb-8 space-y-3">
-                  <h3 className="font-bold text-ghibli-brown text-lg px-1">實用附錄</h3>
-                  
-                  {/* Card 1: Transport Tickets */}
-                  <button 
-                    onClick={() => setActiveTab('TRANSPORT')}
-                    className="w-full bg-white rounded-xl p-4 shadow-sm border border-ghibli-green/10 flex items-center gap-4 hover:shadow-md transition-all group"
-                  >
-                    <div className="bg-blue-50 p-2.5 rounded-full text-blue-500">
-                      <Ticket size={20} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h4 className="font-bold text-ghibli-brown">交通票券</h4>
-                      <p className="text-xs text-gray-500">名古屋附錄篇</p>
-                    </div>
-                    <ArrowRight size={16} className="text-gray-300 group-hover:text-ghibli-orange transition-colors" />
-                  </button>
-
-                  {/* Card 2: Food List */}
-                  <button 
-                    onClick={() => setActiveTab('FOOD')}
-                    className="w-full bg-white rounded-xl p-4 shadow-sm border border-ghibli-green/10 flex items-center gap-4 hover:shadow-md transition-all group"
-                  >
-                    <div className="bg-orange-50 p-2.5 rounded-full text-orange-500">
-                      <Table size={20} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h4 className="font-bold text-ghibli-brown">美食附錄</h4>
-                      <p className="text-xs text-gray-500">完整表格版｜含建議時段</p>
-                    </div>
-                    <ArrowRight size={16} className="text-gray-300 group-hover:text-ghibli-orange transition-colors" />
-                  </button>
-
-                  {/* Card 3: Complete Map List */}
-                  <button 
-                    onClick={() => setActiveTab('FULL_MAP')}
-                    className="w-full bg-white rounded-xl p-4 shadow-sm border border-ghibli-green/10 flex items-center gap-4 hover:shadow-md transition-all group"
-                  >
-                    <div className="bg-purple-50 p-2.5 rounded-full text-purple-500">
-                      <Map size={20} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h4 className="font-bold text-ghibli-brown">完整購物地圖</h4>
-                      <p className="text-xs text-gray-500">超市＋藥妝＋平價店清單</p>
-                    </div>
-                    <ArrowRight size={16} className="text-gray-300 group-hover:text-ghibli-orange transition-colors" />
-                  </button>
-
-                  {/* Card 4: Taiko Shopping */}
-                  <button 
-                    onClick={() => setActiveTab('TAIKO_SHOPPING')}
-                    className="w-full bg-white rounded-xl p-4 shadow-sm border border-ghibli-green/10 flex items-center gap-4 hover:shadow-md transition-all group"
-                  >
-                    <div className="bg-pink-50 p-2.5 rounded-full text-pink-500">
-                      <Store size={20} />
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h4 className="font-bold text-ghibli-brown">名古屋站太閤通口</h4>
-                      <p className="text-xs text-gray-500">超市＆大型平價商店總整理</p>
-                    </div>
-                    <ArrowRight size={16} className="text-gray-300 group-hover:text-ghibli-orange transition-colors" />
-                  </button>
-                </div>
-
-              </div>
-            )}
-
-            {/* Transport Tickets View */}
-            {activeTab === 'TRANSPORT' && (
-              <div className="animate-fade-in pb-24 bg-ghibli-cream">
-                 <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
-                  <button 
-                    onClick={() => setActiveTab('HOME')}
-                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
-                  >
-                    <ChevronLeft className="text-ghibli-brown" />
-                  </button>
-                  <div>
-                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">交通票券總覽</h1>
-                    <span className="text-xs text-gray-500">名古屋附錄篇</span>
-                  </div>
-                </div>
-                
-                <div className="p-4 space-y-6">
-                  {/* Intro */}
-                  <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-700 flex gap-2 items-start border border-blue-100 shadow-sm">
-                     <Info size={16} className="mt-0.5 shrink-0"/>
-                     <p>以下附錄已完全依您的<strong>「最新版行程順序」</strong>重新整理，並整合了交通色塊，方便您快速識別路線。</p>
-                  </div>
-
-                  {/* Child Rules Table */}
-                  <Card>
-                    <h3 className="font-bold text-ghibli-brown mb-3 flex items-center gap-2">
-                        <Ticket size={18} className="text-ghibli-green"/> 4 歲幼童票券規則
-                    </h3>
-                    <div className="overflow-x-auto">
-                         <table className="w-full text-xs text-left">
-                            <thead className="bg-gray-50 text-gray-700 font-bold border-b">
-                                <tr>
-                                    <th className="p-2 whitespace-nowrap">交通方式</th>
-                                    <th className="p-2 whitespace-nowrap text-center">需票?</th>
-                                    <th className="p-2 whitespace-nowrap">備註</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                <tr><td className="p-2 font-medium text-gray-700">地鐵全線</td><td className="p-2 text-center text-green-600 font-bold">免</td><td className="p-2 text-gray-500">不保證座位</td></tr>
-                                <tr><td className="p-2 font-medium text-gray-700">あおなみ線</td><td className="p-2 text-center text-green-600 font-bold">免</td><td className="p-2 text-gray-500">-</td></tr>
-                                <tr><td className="p-2 font-medium text-gray-700">リニモ</td><td className="p-2 text-center text-green-600 font-bold">免</td><td className="p-2 text-gray-500">-</td></tr>
-                                <tr><td className="p-2 font-medium text-gray-700">名鐵普通車</td><td className="p-2 text-center text-green-600 font-bold">免</td><td className="p-2 text-gray-500">可共坐</td></tr>
-                                <tr><td className="p-2 font-medium text-red-600">名鐵 µSKY 指定席</td><td className="p-2 text-center text-red-500 font-bold">需</td><td className="p-2 text-gray-500">因佔位</td></tr>
-                                <tr><td className="p-2 font-medium text-gray-700">KKday 巴士團</td><td className="p-2 text-center text-gray-500">含</td><td className="p-2 text-gray-500">團費多包含</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                  </Card>
-
-                  {/* Daily Schedule Table */}
-                  <Card>
-                     <h3 className="font-bold text-ghibli-brown mb-3 flex items-center gap-2">
-                        <Calendar size={18} className="text-ghibli-orange"/> 新版行程 × 交通票券
-                    </h3>
-                    <div className="overflow-x-auto -mx-2">
-                         <table className="w-full text-xs text-left min-w-[500px]">
-                            <thead className="bg-ghibli-green/10 text-ghibli-brown font-bold border-b border-ghibli-green/20">
-                                <tr>
-                                    <th className="p-2">日次</th>
-                                    <th className="p-2">路線色塊</th>
-                                    <th className="p-2">票券 / 價格</th>
-                                    <th className="p-2">重點</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                <tr>
-                                    <td className="p-2 font-bold text-center">D1</td>
-                                    <td className="p-2"><span className="bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold">名鐵 µSKY</span></td>
-                                    <td className="p-2">指定席券 ¥1,250</td>
-                                    <td className="p-2 text-gray-500">若佔位需票</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-2 font-bold text-center">D2</td>
-                                    <td className="p-2"><span className="bg-blue-800 text-white px-1.5 py-0.5 rounded font-bold">あおなみ線</span></td>
-                                    <td className="p-2">一日券 ¥870</td>
-                                    <td className="p-2 text-gray-500">往返划算</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-2 font-bold text-center">D3</td>
-                                    <td className="p-2"><span className="bg-orange-500 text-white px-1.5 py-0.5 rounded font-bold">名鐵巴士團</span></td>
-                                    <td className="p-2">KKday (含)</td>
-                                    <td className="p-2 text-gray-500">銀時計集合</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-2 font-bold text-center">D4</td>
-                                    <td className="p-2">
-                                        <span className="bg-yellow-400 text-white px-1.5 py-0.5 rounded font-bold mr-1">東山</span>
-                                        <span className="bg-green-500 text-white px-1.5 py-0.5 rounded font-bold">リニモ</span>
-                                    </td>
-                                    <td className="p-2">地鐵券 + リニモ</td>
-                                    <td className="p-2 text-gray-500">吉卜力需預約</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-2 font-bold text-center">D5</td>
-                                    <td className="p-2"><span className="bg-indigo-600 text-white px-1.5 py-0.5 rounded font-bold">名鐵套票</span></td>
-                                    <td className="p-2">ゆったり ¥3,700</td>
-                                    <td className="p-2 text-gray-500">含門票+金券</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-2 font-bold text-center">D6</td>
-                                    <td className="p-2"><span className="bg-gray-500 text-white px-1.5 py-0.5 rounded font-bold">滑雪團</span></td>
-                                    <td className="p-2">KKday (含)</td>
-                                    <td className="p-2 text-gray-500">含溫泉</td>
-                                </tr>
-                                <tr>
-                                    <td className="p-2 font-bold text-center">D7</td>
-                                    <td className="p-2">
-                                        <span className="bg-blue-500 text-white px-1 py-0.5 rounded mr-1">鶴</span>
-                                        <span className="bg-yellow-400 text-white px-1 py-0.5 rounded mr-1">東</span>
-                                        <span className="bg-red-500 text-white px-1 py-0.5 rounded">名</span>
-                                    </td>
-                                    <td className="p-2">地鐵 + µSKY</td>
-                                    <td className="p-2 text-gray-500">移宿機場</td>
-                                </tr>
-                            </tbody>
-                         </table>
-                    </div>
-                  </Card>
-
-                  {/* Tips */}
-                  <div className="space-y-4">
-                      <h3 className="font-bold text-ghibli-brown px-1 flex items-center gap-2">
-                          <AlertCircle size={18} /> 交通購票與動線提醒
-                      </h3>
-                      
-                      <Card className="border-l-4 border-red-400">
-                          <h4 className="font-bold text-red-500 text-sm mb-1">名鐵 µSKY (D1/D7)</h4>
-                          <ul className="text-xs text-gray-600 list-disc list-inside space-y-1">
-                              <li>購買地點: 機場 2F 名鐵售票窗口 (支援中文)</li>
-                              <li>建議 D1 抵達時可同時預購 D7 回程票</li>
-                          </ul>
-                      </Card>
-
-                      <Card className="border-l-4 border-blue-400">
-                          <h4 className="font-bold text-blue-500 text-sm mb-1">樂高樂園 (D2)</h4>
-                          <p className="text-xs text-gray-600">あおなみ線一日券：只要 2 次以上進出站（來回）就會划算。</p>
-                      </Card>
-
-                      <Card className="border-l-4 border-green-400">
-                          <h4 className="font-bold text-green-600 text-sm mb-1">吉卜力公園 (D4)</h4>
-                          <ul className="text-xs text-gray-600 list-disc list-inside space-y-1">
-                              <li>門票必須事前預約，現場不販售</li>
-                              <li>園內多處禁止推車，入口有免費寄放區</li>
-                          </ul>
-                      </Card>
-                      
-                       <Card className="border-l-4 border-indigo-400">
-                          <h4 className="font-bold text-indigo-600 text-sm mb-1">名花之里 (D5)</h4>
-                          <p className="text-xs text-gray-600">套票「ゆったりパック」已包含夜間入場門票和金券 ¥1,000。</p>
-                      </Card>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Food List View */}
-            {activeTab === 'FOOD' && (
-              <div className="animate-fade-in pb-24 bg-ghibli-cream">
-                 <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
-                  <button 
-                    onClick={() => setActiveTab('HOME')}
-                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
-                  >
-                    <ChevronLeft className="text-ghibli-brown" />
-                  </button>
-                  <div>
-                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">美食附錄</h1>
-                    <span className="text-xs text-gray-500">完整表格版｜含建議時段</span>
-                  </div>
-                </div>
-                
-                <div className="p-4 space-y-6">
-                  {/* Intro */}
-                  <div className="bg-orange-50 p-3 rounded-lg text-sm text-orange-700 flex gap-2 items-start border border-orange-100 shadow-sm">
-                     <Info size={16} className="mt-0.5 shrink-0"/>
-                     <p>❗ 溫馨提醒: 所有列出的餐廳均為<strong>親子友善</strong>，大部分支援信用卡與電子支付。</p>
-                  </div>
-
-                  {FOOD_APPENDIX_DATA.map((dayData, index) => (
-                    <Card key={index} className="overflow-hidden">
-                       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
-                          <span className="bg-ghibli-brown text-white text-xs font-bold px-2 py-1 rounded">{dayData.day}</span>
-                          <h3 className="font-bold text-ghibli-brown">{dayData.title}</h3>
-                       </div>
-                       
-                       <div className="space-y-4">
-                         {dayData.items.map((item, i) => (
-                           <div key={i} className={`relative pl-3 ${i !== dayData.items.length - 1 ? 'border-b border-dashed border-gray-100 pb-3' : ''}`}>
-                             <div className={`absolute left-0 top-1.5 w-1 h-8 rounded-full ${item.primary ? 'bg-orange-400' : 'bg-gray-200'}`}></div>
-                             
-                             <div className="flex justify-between items-start">
-                               <div>
-                                 <h4 className={`text-sm ${item.primary ? 'font-bold text-ghibli-brown' : 'font-medium text-gray-700'}`}>
-                                   {item.name}
-                                 </h4>
-                                 <div className="text-xs text-gray-500 mt-0.5">{item.cat}</div>
-                               </div>
-                               <div className="text-right shrink-0">
-                                  <div className="flex items-center justify-end gap-1 text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded mb-1">
-                                    <Clock size={10} /> {item.time}
-                                  </div>
-                                  <div className="text-xs font-mono font-medium text-gray-600">{item.cost}</div>
-                               </div>
-                             </div>
-                             
-                             <div className="mt-2 flex flex-wrap gap-1">
-                               {item.feat.map((f, fi) => (
-                                 <Tag key={fi} color={item.primary ? 'orange' : 'green'}>{f}</Tag>
-                               ))}
-                             </div>
-                           </div>
-                         ))}
-                       </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Complete Map List View */}
-            {activeTab === 'FULL_MAP' && (
-              <div className="animate-fade-in pb-24 bg-ghibli-cream">
-                 <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
-                  <button 
-                    onClick={() => setActiveTab('HOME')}
-                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
-                  >
-                    <ChevronLeft className="text-ghibli-brown" />
-                  </button>
-                  <div>
-                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">完整購物地圖</h1>
-                    <span className="text-xs text-gray-500">超市＋藥妝＋平價店清單</span>
-                  </div>
-                </div>
-
-                <div className="px-6 py-6">
-                  <div className="space-y-6">
-                    {/* Routes */}
-                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-ghibli-orange/10 relative overflow-hidden">
-                       <div className="absolute top-0 right-0 w-20 h-20 bg-orange-50 rounded-bl-full -mr-10 -mt-10 z-0"></div>
-                       <h4 className="font-bold text-ghibli-green text-sm mb-4 flex items-center gap-2 relative z-10">
-                         <Footprints size={18} /> 最佳補給路線建議
-                       </h4>
-                       <div className="space-y-4 relative z-10">
-                         {SHOPPING_ROUTES.map((route, idx) => (
-                           <div key={idx} className="flex flex-col gap-1 text-sm border-b border-gray-50 last:border-0 pb-2 last:pb-0">
-                             <div className="flex items-center justify-between">
-                               <span className="font-bold text-ghibli-brown">{route.title}</span>
-                               <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded">{route.tag}</span>
-                             </div>
-                             <span className="text-gray-500 text-xs">{route.desc}</span>
-                           </div>
-                         ))}
-                       </div>
-                    </div>
-
-                    {/* Shops List */}
-                    <div>
-                      <h4 className="font-bold text-ghibli-brown text-sm mb-3 ml-1">周邊店家一覽</h4>
-                      <div className="grid gap-3">
-                        {SHOPPING_SPOTS.map((shop, idx) => (
-                          <div key={idx} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-l-ghibli-green/30 hover:border-l-ghibli-green transition-all">
-                             <div className="flex-1">
-                               <div className="flex items-center gap-2 mb-1">
-                                 <span className="font-bold text-ghibli-brown">{shop.name}</span>
-                                 <span className="text-[10px] bg-ghibli-cream text-ghibli-brown px-1.5 py-0.5 rounded font-mono">{shop.dist}</span>
-                               </div>
-                               <div className="flex items-center gap-2 flex-wrap mt-1">
-                                 <span className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">{shop.tag}</span>
-                                 {shop.note && <span className="text-[10px] text-red-500 font-medium">• {shop.note}</span>}
-                               </div>
-                             </div>
-                             <button onClick={() => handleNavClick(shop.navLink)} className="p-2 text-blue-500 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors ml-2 shrink-0">
-                               <Navigation size={18} />
-                             </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Taiko Shopping View */}
-            {activeTab === 'TAIKO_SHOPPING' && (
-              <div className="animate-fade-in pb-24 bg-ghibli-cream">
-                 <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
-                  <button 
-                    onClick={() => setActiveTab('HOME')}
-                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
-                  >
-                    <ChevronLeft className="text-ghibli-brown" />
-                  </button>
-                  <div>
-                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">名古屋站太閤通口</h1>
-                    <span className="text-xs text-gray-500">超市＆大型平價商店總整理</span>
-                  </div>
-                </div>
-
-                <div className="px-6 py-6 space-y-8">
-                  
-                  {/* Intro */}
-                  <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-700 flex gap-2 items-start border border-blue-100 shadow-sm">
-                     <Info size={16} className="mt-0.5 shrink-0"/>
-                     <p>以下名單皆是<strong>從您飯店步行可達</strong>或地鐵一站內，非常適合您在 D1、D2、D7 晚上進行補給。</p>
-                  </div>
-
-                  {/* Shops Table (as cards) */}
-                  <div>
-                    <h3 className="font-bold text-ghibli-brown text-lg flex items-center gap-2 mb-4">
-                      <Store size={20} className="text-pink-500"/> 補給地圖總覽
-                    </h3>
-                    <div className="grid gap-3">
-                        {TAIKO_SHOPS_DATA.map((shop, idx) => (
-                          <div key={idx} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-l-pink-300/30 hover:border-l-pink-400 transition-all">
-                             <div className="flex-1">
-                               <div className="flex items-center gap-2 mb-1">
-                                 <span className="font-bold text-ghibli-brown">{shop.name}</span>
-                                 <span className="text-[10px] bg-ghibli-cream text-ghibli-brown px-1.5 py-0.5 rounded font-mono">{shop.dist}</span>
-                               </div>
-                               <div className="text-xs text-gray-600 mb-1">{shop.pros}</div>
-                               <div className="flex items-center gap-2 flex-wrap mt-1">
-                                 <span className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">{shop.type}</span>
-                                 {shop.note && <span className="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded">• {shop.note}</span>}
-                               </div>
-                             </div>
-                             <button onClick={() => handleNavClick(shop.navLink)} className="p-2 text-blue-500 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors ml-2 shrink-0">
-                               <Navigation size={18} />
-                             </button>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-
-                  {/* Routes */}
-                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-ghibli-orange/10 relative overflow-hidden">
-                       <div className="absolute top-0 right-0 w-20 h-20 bg-orange-50 rounded-bl-full -mr-10 -mt-10 z-0"></div>
-                       <h3 className="font-bold text-ghibli-green text-lg mb-4 flex items-center gap-2 relative z-10">
-                         <Footprints size={20} /> 最佳補給路線建議
-                       </h3>
-                       <div className="space-y-4 relative z-10">
-                         {TAIKO_ROUTES_DATA.map((route, idx) => (
-                           <div key={idx} className="flex flex-col gap-1 text-sm border-b border-gray-50 last:border-0 pb-4 last:pb-0">
-                             <div className="flex items-center justify-between mb-1">
-                               <span className="font-bold text-ghibli-brown text-base">{route.title}</span>
-                               {route.tag && <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded">{route.tag}</span>}
-                             </div>
-                             <div className="flex items-center gap-2 text-xs font-mono bg-gray-50 p-2 rounded text-gray-700 mb-1">
-                                <MapPin size={12}/> {route.path}
-                             </div>
-                             <span className="text-gray-500 text-xs leading-relaxed">{route.desc}</span>
-                           </div>
-                         ))}
-                       </div>
-                  </div>
-
-                  {/* Donki List */}
-                  <div className="bg-yellow-50/80 rounded-2xl p-5 shadow-sm border border-yellow-200">
-                    <h3 className="font-bold text-yellow-800 text-lg mb-2 flex items-center gap-2">
-                       <ShoppingBag size={20} /> DONKI 快速採買懶人包
-                    </h3>
-                    <p className="text-xs text-yellow-700/80 mb-4">榮本店/名站西店皆適用，20 分鐘快速採購清單。</p>
-                    
-                    <div className="space-y-4">
-                      {DONKI_LIST_DATA.map((category, idx) => (
-                        <div key={idx} className="bg-white rounded-xl p-3 shadow-sm">
-                           <h4 className="font-bold text-ghibli-brown text-sm mb-2 pb-1 border-b border-gray-100">{category.category}</h4>
-                           <ul className="space-y-2">
-                             {category.items.map((item, i) => (
-                               <li key={i} className="flex items-start gap-2 text-xs text-gray-700">
-                                 <CheckCircle size={14} className="text-yellow-500 shrink-0 mt-0.5"/>
-                                 <span>{item}</span>
-                               </li>
-                             ))}
-                           </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            )}
-            
-            {/* Currency View (Dedicated Page) */}
-            {activeTab === 'CURRENCY' && (
-              <div className="animate-fade-in bg-ghibli-cream min-h-screen pb-24">
-                <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4">
-                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">匯率換算</h1>
-                    <span className="text-xs text-gray-500">即時 JPY 轉 TWD 計算機</span>
-                </div>
-                <div className="pt-8">
-                   <CurrencyConverter />
-                   <div className="px-6 mt-8">
-                      <div className="bg-white rounded-2xl p-6 text-center text-gray-400 text-sm">
-                         <Calculator size={48} className="mx-auto mb-4 opacity-20" />
-                         <p>請輸入日幣金額，自動換算為台幣。</p>
-                         <p className="text-xs mt-2 opacity-60">匯率來源：ExchangeRate-API (免費版)</p>
-                      </div>
-                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tools View */}
-            {activeTab === 'TOOLS' && (
-              <div className="animate-fade-in">
-                  <ToolsView />
-              </div>
-            )}
-
-            {/* Bottom Nav */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white/90 backdrop-blur-md shadow-2xl rounded-full p-2 flex justify-between items-center border border-gray-100 z-50">
-              <button 
-                  onClick={() => { setActiveTab('HOME'); setSelectedDayId(null); }}
-                  className={`flex-1 flex flex-col items-center py-2 rounded-full transition-all ${activeTab === 'HOME' ? 'text-ghibli-green bg-green-50' : 'text-gray-400'}`}
-              >
-                  <Calendar size={20} />
-                  <span className="text-[10px] font-bold mt-0.5">行程</span>
-              </button>
-              <div className="w-px h-8 bg-gray-200"></div>
-              <button 
-                  onClick={() => setActiveTab('CURRENCY')}
-                  className={`flex-1 flex flex-col items-center py-2 rounded-full transition-all ${activeTab === 'CURRENCY' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-400'}`}
-              >
-                  <Coins size={20} />
-                  <span className="text-[10px] font-bold mt-0.5">匯率</span>
-              </button>
-              <div className="w-px h-8 bg-gray-200"></div>
-              <button 
-                  onClick={() => setActiveTab('TOOLS')}
-                  className={`flex-1 flex flex-col items-center py-2 rounded-full transition-all ${activeTab === 'TOOLS' ? 'text-ghibli-orange bg-orange-50' : 'text-gray-400'}`}
-              >
-                  <MapPin size={20} />
-                  <span className="text-[10px] font-bold mt-0.5">工具</span>
-              </button>
-            </div>
+          <div className="max-w-md mx-auto min-h-screen bg-[#f4f1ea] shadow-xl overflow-hidden relative font-sans text-gray-800">
+             {activeTab === 'HOME' && renderHome()}
+             {activeTab === 'CURRENCY' && <CurrencyView />}
+             {activeTab === 'TOOLS' && <ToolsView />}
+             <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
           </div>
         );
       };
