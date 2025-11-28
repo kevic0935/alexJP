@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -280,13 +281,27 @@
         { category: "🧸【4】兒童 (3F)", items: ["入浴球 (驚喜玩具)", "麵包超人牙刷 3入組"] }
       ];
 
-      // --- COMPONENTS ---
+      // --- HELPERS ---
+
+      const getWeatherIcon = (code) => {
+        if (code <= 1) return <Sun size={24} className="text-orange-500" />;
+        if (code <= 3) return <Cloud size={24} className="text-gray-400" />;
+        if (code <= 48) return <CloudFog size={24} className="text-gray-400" />;
+        if (code <= 67) return <CloudRain size={24} className="text-blue-400" />;
+        if (code <= 77) return <Snowflake size={24} className="text-blue-300" />;
+        if (code <= 82) return <CloudRain size={24} className="text-blue-500" />;
+        if (code <= 86) return <Snowflake size={24} className="text-blue-300" />;
+        if (code <= 99) return <CloudLightning size={24} className="text-purple-500" />;
+        return <Sun size={24} className="text-orange-500" />;
+      };
 
       const openGoogleMaps = (location) => {
         window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
       };
 
-      const WeatherWidget = () => {
+      // --- HOOKS ---
+
+      const useNagoyaWeather = () => {
         const [weather, setWeather] = useState(null);
         const [loading, setLoading] = useState(true);
 
@@ -306,55 +321,27 @@
           };
           fetchWeather();
         }, []);
+        return { weather, loading };
+      };
 
-        const getWeatherIcon = (code) => {
-          if (code <= 1) return <Sun size={24} className="text-orange-500" />;
-          if (code <= 3) return <Cloud size={24} className="text-gray-400" />;
-          if (code <= 48) return <CloudFog size={24} className="text-gray-400" />;
-          if (code <= 67) return <CloudRain size={24} className="text-blue-400" />;
-          if (code <= 77) return <Snowflake size={24} className="text-blue-300" />;
-          if (code <= 82) return <CloudRain size={24} className="text-blue-500" />;
-          if (code <= 86) return <Snowflake size={24} className="text-blue-300" />;
-          if (code <= 99) return <CloudLightning size={24} className="text-purple-500" />;
-          return <Sun size={24} className="text-orange-500" />;
-        };
+      // --- COMPONENTS ---
 
-        if (loading) return (
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg mb-4 animate-pulse h-32 flex items-center justify-center">
-             載入天氣資訊...
-          </div>
-        );
-
-        if (!weather) return null;
-
-        const current = weather.current;
+      const WeeklyForecastWidget = ({ weather, loading }) => {
+        if (loading || !weather) return null;
         const daily = weather.daily;
 
         return (
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg mb-4">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-3">
-                {getWeatherIcon(current.weather_code)}
-                <div>
-                  <div className="text-3xl font-bold">{Math.round(current.temperature_2m)}°C</div>
-                  <div className="text-xs opacity-90">名古屋・即時</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center gap-1 justify-end">
-                  <Thermometer size={14} /> 體感 {Math.round(current.apparent_temperature)}°C
-                </div>
-                <div className="text-xs opacity-75 mt-1">一週預報 →</div>
-              </div>
-            </div>
-
-            <div className="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
+          <div className="bg-ghibli-green/5 rounded-xl p-2 overflow-hidden mb-4">
+            <div className="flex overflow-x-auto gap-3 no-scrollbar items-center px-1">
+              <span className="text-[10px] text-ghibli-green font-bold shrink-0 writing-mode-vertical">未來一週</span>
               {daily.time.map((t, i) => (
-                <div key={i} className="flex flex-col items-center min-w-[3.5rem] bg-white/20 rounded-lg p-2 backdrop-blur-sm">
-                  <span className="text-[10px] opacity-90">{new Date(t).toLocaleDateString('zh-TW', {weekday: 'short'})}</span>
-                  <div className="my-1 scale-75">{getWeatherIcon(daily.weather_code[i])}</div>
-                  <span className="text-xs font-bold">{Math.round(daily.temperature_2m_max[i])}°</span>
-                  <span className="text-[10px] opacity-75">{Math.round(daily.temperature_2m_min[i])}°</span>
+                <div key={i} className="flex flex-col items-center min-w-[2.5rem] shrink-0">
+                  <span className="text-[9px] text-gray-500">{new Date(t).toLocaleDateString('zh-TW', {weekday: 'short'})}</span>
+                  <div className="my-0.5 scale-75 origin-center">{getWeatherIcon(daily.weather_code[i])}</div>
+                  <div className="flex gap-1 text-[10px] font-mono leading-none">
+                     <span className="font-bold text-gray-800">{Math.round(daily.temperature_2m_max[i])}</span>
+                     <span className="text-gray-400">{Math.round(daily.temperature_2m_min[i])}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -758,7 +745,6 @@
             <h1 className="text-xl font-bold">完整購物地圖</h1>
           </div>
           
-          {/* Originally Taiko Shopping Content */}
           <div className="p-4 space-y-6">
             <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
               <p>🛍️ <strong>名古屋站太閤通口</strong> (Daiwa Roynet 飯店周邊) 補給攻略。</p>
@@ -889,6 +875,9 @@
         const [activeTab, setActiveTab] = useState('HOME');
         const [selectedDayId, setSelectedDayId] = useState(null);
         const [view, setView] = useState('MAIN'); // MAIN, TRANSPORT, FOOD, FULL_MAP, TAIKO_SHOPPING
+        
+        // Lift weather state to App so header can access it
+        const { weather, loading } = useNagoyaWeather();
 
         const handleTabChange = (tab) => {
           setActiveTab(tab);
@@ -916,12 +905,25 @@
                   <h1 className="text-2xl font-bold text-ghibli-green">名古屋親子遊</h1>
                   <p className="text-sm text-gray-500">8 天 7 夜自駕行程</p>
                 </div>
-                <div className="bg-ghibli-cream px-3 py-1 rounded-full text-xs font-bold text-ghibli-brown">
-                  2024
+                {/* Weather Badge in Header */}
+                <div className="bg-ghibli-cream border border-ghibli-green/20 px-3 py-1.5 rounded-xl flex items-center gap-2 shadow-sm">
+                  {loading ? (
+                    <span className="text-xs text-gray-400">載入中...</span>
+                  ) : weather ? (
+                    <>
+                      <div className="scale-75 origin-center">{getWeatherIcon(weather.current.weather_code)}</div>
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-ghibli-green leading-none">{Math.round(weather.current.temperature_2m)}°C</div>
+                        <div className="text-[10px] text-gray-500 leading-none mt-0.5">體感 {Math.round(weather.current.apparent_temperature)}°</div>
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-xs text-gray-400">N/A</span>
+                  )}
                 </div>
               </header>
 
-              <WeatherWidget />
+              <WeeklyForecastWidget weather={weather} loading={loading} />
 
               <div className="grid grid-cols-2 gap-3">
                 {ITINERARY_DATA.map(day => (
