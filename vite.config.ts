@@ -1,1 +1,1 @@
-// Build config not required for static "no-build" deployment.
+export default {};
