@@ -73,7 +73,9 @@
       import { 
         Sun, Cloud, Snowflake, CloudRain, 
         MapPin, Utensils, AlertCircle, Plane, Bed, Wallet, 
-        ChevronLeft, Calendar, Info, Navigation, ArrowRight 
+        ChevronLeft, Calendar, Info, Navigation, ArrowRight,
+        ShoppingBag, Footprints, Store, Ticket, Table, TrainFront, Map,
+        CheckCircle, XCircle, Clock, Banknote
       } from 'lucide-react';
       import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -85,18 +87,20 @@
           dateLabel: "D1",
           title: "抵達名古屋・入住日",
           weather: { temp: "10°C / 4°C", condition: "多雲時晴", icon: 'cloud' },
-          highlights: ["中部國際機場", "名鐵 µSKY", "味仙拉麵"],
+          highlights: ["中部國際機場", "名鐵 µSKY", "味仙拉麵", "便利商店備案"],
           schedule: [
-            { time: "17:15", title: "台灣起飛", description: "前往中部國際機場", type: "transport" },
-            { time: "20:50", title: "抵達機場", important: "夜間航班人潮少，確保娃娃車/行李", type: "transport" },
-            { time: "22:00", title: "搭乘 µSKY", description: "直達名古屋站 (28分)", important: "建議買兒童指定席", type: "transport" },
-            { time: "22:45", title: "飯店 Check-in", description: "Daiwa Roynet 新幹線口", type: "visit", navLink: "Daiwa Roynet Hotel Nagoya Taiko dori Side" },
+            { time: "17:15", title: "台灣 → 名古屋", description: "中部國際機場 (NGO)", important: "確保娃娃車、行李標籤", type: "transport" },
+            { time: "20:50", title: "抵達 & 入境", description: "夜間航班人潮不多，通關約 30-40 分鐘", type: "transport" },
+            { time: "21:40", title: "名鐵 µSKY 購票", description: "建議現場買票 (窗口可買兒童座位票)", important: "建議去人工櫃台", type: "transport" },
+            { time: "22:00", title: "搭 µSKY → 名古屋站", description: "直達 28 分鐘 (適合帶小孩不換車)", important: "若孩子會睡著，建議買兒童指定席", type: "transport" },
+            { time: "22:45", title: "飯店 Check-in", description: "Daiwa Roynet 新幹線口 (步行3-5分鐘)", important: "可請飯店提供兒童備品", type: "visit", navLink: "Daiwa Roynet Hotel Nagoya Taiko dori Side" },
           ],
           food: [
-            { name: "味仙 (名古屋駅前店)", type: "台式拉麵", price: "¥1,000~¥1,800", features: ["可點不辣", "青菜", "炒飯"], isPrimary: true, navLink: "味仙 名古屋駅前店" },
-            { name: "世界的山將 (名駅店)", type: "夢幻雞翅", price: "¥1,200~¥2,000", features: ["招牌雞翅", "串燒"], isPrimary: false, navLink: "世界的山將 名古屋站" },
+            { name: "味仙 (主選)", type: "台式拉麵", price: "¥1,000~", features: ["可點不辣", "炒飯", "青菜"], isPrimary: true, navLink: "味仙 名古屋駅前店" },
+            { name: "世界の山ちゃん", type: "替代方案", price: "¥1,200~", features: ["招牌雞翅", "串燒"], isPrimary: false, navLink: "世界的山ちゃん 名駅店" },
+            { name: "便利商店 (備案)", type: "FamilyMart/Lawson", price: "宵夜", features: ["飯糰", "炸雞串", "甜點"], isPrimary: false, navLink: "名古屋駅 新幹線口 便利商店" },
           ],
-          tips: ["µSKY 速度快，若小孩太累建議直接便利商店買宵夜回飯店。", "飯店可索取兒童備品。"]
+          tips: ["µSKY: 若孩子會睡著，建議買兒童指定席。", "若小孩太累，建議直接吃便利商店+早休息。", "飯店位於新幹線口(太閤通口)，出站步行約 4 分鐘。"]
         },
         {
           id: 2,
@@ -105,17 +109,21 @@
           weather: { temp: "12°C / 5°C", condition: "晴朗", icon: 'sun' },
           highlights: ["LEGO NINJAGO", "Submarine Adventure", "Miniland"],
           schedule: [
-            { time: "09:30", title: "入園", description: "搭乘あおなみ線至金城ふ頭站", type: "visit" },
-            { time: "09:30-11:30", title: "熱門設施衝刺", description: "Ninjago, Submarine, Lost Kingdom", type: "visit" },
-            { time: "11:30", title: "休息 & 拍照", description: "MiniLand (室內涼爽)", type: "rest" },
-            { time: "13:00", title: "第二輪遊玩", description: "Driving School (4歲愛), Duplo Play", type: "visit" },
-            { time: "18:00", title: "晚餐 & 休息", description: "返回名古屋站周邊", type: "food" },
+            { time: "09:30", title: "入園", description: "搭乘あおなみ線至金城ふ頭站 (建議買一日券)", type: "visit" },
+            { time: "09:30-11:30", title: "第一輪 (人氣最高)", description: "Ninjago, Submarine, Lost Kingdom", type: "visit" },
+            { time: "11:30-12:00", title: "休息 & 拍照", description: "MiniLand (室內涼爽)", type: "rest" },
+            { time: "13:00-15:30", title: "第二輪 (彈性)", description: "Driving School (4歲愛), Duplo Play", type: "visit" },
+            { time: "16:00-17:00", title: "第三輪 (輕鬆)", description: "Pirate Splash Battle, Build & Test", type: "visit" },
+            { time: "17:00", title: "離園", description: "買小物+拍照", type: "transport" },
           ],
           food: [
-            { name: "Brick House Burger", type: "樂園午餐", price: "¥1,200~", features: ["樂高造型漢堡"], isPrimary: true },
-            { name: "天むす 千壽", type: "炸蝦飯糰", price: "¥800~", features: ["外帶回飯店", "高島屋B1"], isPrimary: false, navLink: "JR Takashimaya Nagoya" },
+            { name: "Brick House Burger", type: "午餐(造型)", price: "¥1,200~", features: ["樂高造型漢堡"], isPrimary: true },
+            { name: "Coral Reef Pizza", type: "午餐(吃到飽)", price: "¥1,800~", features: ["義大利麵/披薩", "兒童最愛"], isPrimary: false },
+            { name: "Chicken Diner", type: "午餐(速食)", price: "¥1,000~", features: ["炸雞", "出餐最快"], isPrimary: false },
+            { name: "天むす 千壽", type: "晚餐(A:省時)", price: "¥800~", features: ["炸蝦飯糰", "高島屋B1外帶", "孩子可吃"], isPrimary: true, navLink: "JR Takashimaya Nagoya" },
+            { name: "味仙 / 山ちゃん", type: "晚餐(C:名物)", price: "¥1,500~", features: ["不辣拉麵", "招牌雞翅"], isPrimary: false, navLink: "世界的山ちゃん 名駅店" },
           ],
-          tips: ["樂園不適合全程推車，建議停放入口。", "MiniLand 是最佳室內休息站。", "下雨可去 Duplo Play 或 Police Station。"]
+          tips: ["樂園不適合推車進場 (入口可停放)。", "MiniLand 是最佳室內休息站。", "下雨請直接去 Duplo Play 或 Police Station。"]
         },
         {
           id: 3,
@@ -125,105 +133,264 @@
           highlights: ["高山老街", "飛驒牛壽司", "合掌村"],
           schedule: [
             { time: "08:45", title: "集合", description: "名鐵巴士中心・太閤通口 (銀時計)", important: "準時集合!", type: "transport" },
-            { time: "11:30", title: "高山老街", description: "上三之町散步、吃午餐", type: "visit" },
-            { time: "14:30", title: "白川鄉合掌村", description: "民家園、和田家、明善寺", important: "注意雪地路滑", type: "visit" },
-            { time: "19:00", title: "返回名古屋", description: "晚餐建議吃鰻魚飯", type: "transport" },
+            { time: "09:00", title: "出發", description: "前往高山 (車程約 2.5 小時)", type: "transport" },
+            { time: "11:30-13:30", title: "高山老街", description: "上三之町散步、午餐", type: "visit" },
+            { time: "14:30-16:00", title: "白川鄉合掌村", description: "河岸拍照、民家園、和田家", important: "不建議去城山展望台(路滑)", type: "visit" },
+            { time: "16:30", title: "返程", description: "預計 19:00 抵達名古屋", type: "transport" },
           ],
           food: [
-            { name: "飛騨牛飯 匠家", type: "燒肉/丼飯", price: "¥1,800~", features: ["出餐快", "親子友善"], isPrimary: true, navLink: "Takumiya Takayama" },
-            { name: "金乃こって牛", type: "飛驒牛壽司", price: "¥1,000", features: ["必吃小吃", "排隊名店"], isPrimary: false },
-            { name: "しら河", type: "鰻魚三吃", price: "¥2,800~", features: ["清爽口味", "晚餐推薦"], isPrimary: true, navLink: "Hitsumabushi Shirakawa" },
+            { name: "飛騨牛飯 匠家", type: "午餐(主推)", price: "¥1,800~", features: ["飛驒牛丼", "出餐快", "小孩友善"], isPrimary: true, navLink: "Takumiya Takayama" },
+            { name: "丸明 高山安川店", type: "午餐(備選)", price: "¥2,800~", features: ["A5燒肉", "排隊值得"], isPrimary: false, navLink: "Maruaki Takayama Yasukawa" },
+            { name: "金乃こって牛", type: "必吃小吃", price: "¥1,000", features: ["飛驒牛壽司三貫"], isPrimary: false, navLink: "Kotte Ushi" },
+            { name: "しら河", type: "晚餐(主選)", price: "¥2,800~", features: ["鰻魚三吃", "清爽不膩"], isPrimary: true, navLink: "Hitsumabushi Shirakawa" },
+            { name: "ひつまぶし備長", type: "晚餐(備選)", price: "¥3,500~", features: ["出餐快", "炭烤香"], isPrimary: false, navLink: "Hitsumabushi Bincho" },
           ],
-          tips: ["必備：防滑雪靴、暖暖包、防水手套。", "不建議帶推車去城山展望台，路滑危險。"]
+          tips: ["必備：防滑雪地鞋(或鞋套)、暖暖包、防水手套。", "小孩容易滑倒，注意積雪與溶雪凍水。", "城山展望台路滑且常排隊，不建議前往。"]
         },
         {
           id: 4,
           dateLabel: "D4",
-          title: "吉卜力公園 (大倉庫)",
+          title: "吉卜力公園一日遊 (完整版)",
           weather: { temp: "10°C / 3°C", condition: "多雲", icon: 'cloud' },
-          highlights: ["吉卜力大倉庫", "龍貓隧道", "風之谷Cafe"],
+          highlights: ["吉卜力大倉庫", "龍貓隧道", "AEON 玩具反斗城"],
           schedule: [
-            { time: "09:30", title: "抵達公園", description: "地鐵東山線 → 藤が丘 → リニモ", type: "transport" },
-            { time: "10:00", title: "大倉庫參觀", description: "名場面展、天空之城機器人", important: "需預約QR Code", type: "visit" },
-            { time: "13:00", title: "午餐", description: "園內或 AEON 長久手", type: "food" },
-            { time: "15:00", title: "AEON 購物", description: "玩具反斗城、休息", type: "shopping" },
+            { time: "09:30", title: "抵達公園", description: "地鐵東山線 → 藤が丘 → リニモ (約50分)", important: "建議提前 15-30 分鐘排隊", type: "transport" },
+            { time: "10:00", title: "大倉庫參觀 (需預約)", description: "龍貓隧道 (小孩最愛)、飛行船、名場面展", important: "請準備好預約 QR Code", type: "visit" },
+            { time: "13:00", title: "午餐時間", description: "園內咖啡廳 或 AEON 美食街", type: "food" },
+            { time: "15:00", title: "AEON 長久手購物", description: "玩具反斗城 (超大)、親子休息區", type: "shopping" },
+            { time: "18:00", title: "晚餐", description: "返回名古屋市區享用鰻魚飯", type: "food" },
           ],
           food: [
-            { name: "風之谷 Café", type: "輕食/簡餐", price: "¥1,200~", features: ["園內", "特製三明治"], isPrimary: true },
-            { name: "AEON 美食街", type: "各式料理", price: "¥900~", features: ["選擇多", "便宜"], isPrimary: false, navLink: "Aeon Mall Nagakute" },
+            { name: "風之谷 Café", type: "園內簡餐", price: "¥1,200~", features: ["咖哩飯(小辣)", "三明治"], isPrimary: true, navLink: "Ghibli Park" },
+            { name: "AEON 美食街", type: "備選", price: "¥900~", features: ["炸雞", "烏龍麵", "選擇多"], isPrimary: false, navLink: "Aeon Mall Nagakute" },
+            { name: "しら河 (晚餐)", type: "鰻魚三吃", price: "¥2,800~", features: ["清爽不膩", "孩子友善"], isPrimary: true, navLink: "Hitsumabushi Shirakawa" },
+            { name: "ひつまぶし備長", type: "晚餐備選", price: "¥3,500~", features: ["出餐快", "省時"], isPrimary: false, navLink: "Hitsumabushi Bincho" },
           ],
-          tips: ["大倉庫禁止推車入館 (需寄放)。", "建議預留 3-4 小時參觀。", "展區冷氣較強，帶薄外套。"]
+          tips: ["大倉庫禁止推車入館 (入口有免費寄放區)。", "建議預留 3-4 小時參觀大倉庫。", "展區冷氣較強，請攜帶薄外套。", "門票建議：大倉庫單館票 (Standard)，全室內不怕雨。"]
         },
         {
           id: 5,
           dateLabel: "D5",
           title: "Outlet & 名花之里",
-          weather: { temp: "11°C / 2°C", condition: "有風 / 晴", icon: 'sun' },
+          weather: { temp: "11°C / 2°C", condition: "有風/晴", icon: 'sun' },
           highlights: ["三井 Outlet", "光之隧道", "水上燈光秀"],
           schedule: [
-            { time: "09:10", title: "巴士出發", description: "名鐵巴士中心 (使用套票)", type: "transport" },
-            { time: "10:10", title: "Outlet 購物", description: "North Area (精品) -> South Area (雜貨)", type: "shopping" },
+            { time: "09:10", title: "巴士出發", description: "名鐵巴士中心 (使用「ゆったりパック」套票)", important: "成人¥3,700/兒童¥2,100 (含金券)", type: "transport" },
+            { time: "10:10", title: "Outlet 購物", description: "動線：North (精品/運動) → South (雜貨)", type: "shopping" },
+            { time: "12:00", title: "午餐", description: "中央休息區美食街", type: "food" },
             { time: "16:00", title: "前往名花之里", description: "搭乘接駁巴士", type: "transport" },
-            { time: "17:30", title: "點燈賞花", description: "光之隧道、大草坪主秀", type: "visit" },
+            { time: "17:00", title: "點燈賞花", description: "溫室(休息) → 光之隧道 → 大草坪主秀", important: "點燈瞬間最美 (約17:00)", type: "visit" },
+            { time: "19:00", title: "晚餐/返回", description: "回名古屋市區吃雞翅/拉麵", type: "food" },
           ],
           food: [
-            { name: "VANSAN", type: "義式料理", price: "¥1,500~", features: ["親子友善", "免費兒童餐具"], isPrimary: true },
-            { name: "矢場とん", type: "味噌豬排", price: "¥1,500~", features: ["名古屋名物"], isPrimary: false },
+            { name: "VANSAN (Outlet)", type: "義式料理", price: "¥1,500~", features: ["親子友善", "免費兒童餐具"], isPrimary: true, navLink: "Italian Kitchen VANSAN Jazz Dream Nagashima" },
+            { name: "矢場とん (Outlet)", type: "味噌豬排", price: "¥1,500~", features: ["名古屋名物", "可選不辣"], isPrimary: false, navLink: "Yabaton Jazz Dream Nagashima" },
+            { name: "まるは食堂 (Outlet)", type: "炸蝦定食", price: "¥1,800~", features: ["巨大炸蝦", "名物"], isPrimary: false, navLink: "Maruha Shokudo Jazz Dream" },
+            { name: "世界の山ちゃん", type: "晚餐(名站)", price: "¥2,000~", features: ["方便", "親子可食"], isPrimary: false, navLink: "世界的山ちゃん 名駅店" },
           ],
-          tips: ["套票包含：來回巴士 + 入園券 + ¥1000 金券。", "名花之里夜間很冷，務必穿厚外套。", "溫室是最佳保暖休息點。"]
+          tips: ["套票「ゆったりパック」最划算 (含交通+門票+¥1000金券)。", "推薦品牌：Beams, United Arrows, Nike, BREEZE(童裝)。", "名花之里夜間很冷，務必穿厚外套、圍巾、帶暖暖包。", "「溫室」是最佳保暖休息點。"]
         },
         {
           id: 6,
           dateLabel: "D6",
-          title: "牧歌之里雪樂園 & 溫泉",
-          weather: { temp: "4°C / -5°C", condition: "降雪", icon: 'snow' },
-          highlights: ["雪盆", "動物餵食", "牧華溫泉"],
+          title: "牧歌之里冰雪樂園 + 溫泉體驗日",
+          weather: { temp: "4°C / -5°C", condition: "降雪 / 晴", icon: 'snow' },
+          highlights: ["雪盆戲雪", "動物餵食", "牧華溫泉"],
           schedule: [
-            { time: "09:10", title: "出發", description: "KKday 巴士團", type: "transport" },
-            { time: "10:30", title: "冰雪樂園", description: "玩雪盆、堆雪人、餵羊", type: "visit" },
-            { time: "15:00", title: "溫泉體驗", description: "牧華溫泉 (室內+露天)", important: "先沖澡再泡", type: "rest" },
-            { time: "17:00", title: "返回名古屋", description: "約 19:00 抵達", type: "transport" },
+            { time: "08:45", title: "集合", description: "名鐵巴士中心 (太閤通口 銀時計)", important: "準時集合", type: "transport" },
+            { time: "09:10", title: "出發", description: "前往牧歌之里 (車程約 1.5 小時)", type: "transport" },
+            { time: "10:30-15:00", title: "冰雪樂園", description: "動線：入口 → 雪盆區 → 堆雪人 → 動物區", important: "必備防水手套、防滑靴、備用襪子", type: "visit" },
+            { time: "15:00-16:30", title: "溫泉體驗", description: "牧華溫泉 (室內+露天)", important: "入池前請先沖澡", type: "rest" },
+            { time: "17:00", title: "返回名古屋", description: "預計 19:00 抵達解散", type: "transport" },
           ],
           food: [
-            { name: "ふる里亭", type: "牛奶鍋/咖哩", price: "¥1,500~", features: ["口味偏甜", "小孩愛吃"], isPrimary: true },
-            { name: "世界の山ちゃん", type: "居酒屋", price: "¥2,000~", features: ["回名古屋吃", "方便"], isPrimary: false },
+            { name: "ふる里亭 (園內)", type: "午餐(親子)", price: "¥1,500~", features: ["牛奶鍋", "甜味咖哩"], isPrimary: true, navLink: "Bokka no Sato" },
+            { name: "まきばの館 (園內)", type: "午餐(洋食)", price: "¥1,200~", features: ["漢堡排", "出餐快"], isPrimary: false, navLink: "Bokka no Sato" },
+            { name: "世界の山ちゃん", type: "晚餐(名站)", price: "¥2,000~", features: ["玉子燒", "味噌豬排", "近飯店"], isPrimary: true, navLink: "世界的山ちゃん 名駅店" },
+            { name: "味仙 (名站)", type: "晚餐(暖胃)", price: "¥1,500~", features: ["不辣拉麵"], isPrimary: false, navLink: "味仙 名古屋駅前店" },
           ],
-          tips: ["多帶一套備用襪子給小孩。", "溫泉刺青需遮蓋。", "雪地反射強，可戴墨鏡。"]
+          tips: ["必備：防滑雪靴(或鞋套)、防水手套、小孩備用襪子。", "溫泉刺青需貼遮蓋貼。", "雪地反射強，建議配戴墨鏡。"]
         },
         {
           id: 7,
           dateLabel: "D7",
           title: "科學館・大須・機場",
           weather: { temp: "13°C / 6°C", condition: "晴朗", icon: 'sun' },
-          highlights: ["兒童科學館", "大須商店街", "唐吉軻德"],
+          highlights: ["兒童科學館", "大須商店街", "唐吉軻德採買"],
           schedule: [
-            { time: "10:00", title: "名古屋市科學館", description: "直奔 2F 兒童館 & 3F 放電實驗", type: "visit" },
-            { time: "14:00", title: "大須商店街", description: "吃小吃、買藥妝", type: "shopping" },
-            { time: "16:00", title: "唐吉軻德榮店", description: "最後補貨 (3F 兒童區)", type: "shopping" },
-            { time: "20:00", title: "前往機場", description: "搭 µSKY 至機場飯店", type: "transport" },
+            { time: "10:00", title: "名古屋市科學館", description: "必玩：2F 兒童館 & 3F 放電實驗", important: "中學生以下免費", type: "visit", navLink: "Nagoya City Science Museum" },
+            { time: "12:30", title: "午餐 (榮區)", description: "サガミ 或 コメダ珈琲", type: "food" },
+            { time: "14:00", title: "大須商店街", description: "路線：大須觀音站(2號出口) → 赤門通(扭蛋) → 新天地通", type: "shopping", navLink: "Osu Shopping District" },
+            { time: "15:15", title: "唐吉軻德榮本店", description: "1F零食(麵包超人)、2F藥妝(眼藥水)、3F兒童(入浴球)", type: "shopping", navLink: "Don Quijote Sakae" },
+            { time: "17:30", title: "晚餐 & 取行李", description: "榮區晚餐後，回飯店取行李", important: "建議 17:10 前入店晚餐", type: "food" },
+            { time: "20:00", title: "前往機場", description: "名鐵 µSKY → 中部國際機場", type: "transport" },
+            { time: "21:00", title: "入住機場飯店", description: "Comfort Hotel Centrair (連通航廈)", type: "rest", navLink: "Comfort Hotel Central International Airport" },
           ],
           food: [
-            { name: "サガミ (榮店)", type: "和食家庭餐", price: "¥1,200~", features: ["蕎麥麵", "兒童餐"], isPrimary: true },
-            { name: "金魚虎燒", type: "鯛魚燒", price: "¥300", features: ["大須名物", "可愛"], isPrimary: false },
+            { name: "サガミ 栄店", type: "午餐(和食)", price: "¥1,200~", features: ["蕎麥麵", "兒童餐"], isPrimary: true, navLink: "Sagami Sakae" },
+            { name: "金魚虎燒", type: "大須小吃", price: "¥300", features: ["可愛鯛魚燒", "外酥內軟"], isPrimary: false, navLink: "Kingyo Tayaki" },
+            { name: "しら河 榮ガスビル店", type: "晚餐(鰻魚)", price: "¥2,800~", features: ["鰻魚三吃", "清爽"], isPrimary: true, navLink: "Shirakawa Sakae Gas Building" },
           ],
-          tips: ["科學館推車友善，但大須商店街人多路窄不建議。", "晚上入住機場飯店 (Comfort Hotel)。"]
+          tips: ["科學館推車友善，但大須商店街人多路窄不建議全程使用。", "Donki 採買重點：1F 伴手禮、2F 藥妝、3F 兒童用品。", "晚餐建議 17:10 前入店避免排隊。"]
         },
         {
           id: 8,
           dateLabel: "D8",
-          title: "回程日",
+          title: "回程日 (中部國際機場 → 台灣)",
           weather: { temp: "11°C / 5°C", condition: "多雲", icon: 'cloud' },
-          highlights: ["蝦仙貝之里", "兒童遊戲區", "返台"],
+          highlights: ["Comfort Hotel", "蝦仙貝之里", "兒童遊戲區"],
           schedule: [
-            { time: "07:00", title: "飯店早餐", description: "Comfort Hotel 自助餐", type: "food" },
-            { time: "08:00", title: "前往航廈", description: "步行 3 分鐘 (連通)", type: "transport" },
-            { time: "09:00", title: "報到托運", description: "預留時間逛免稅店", type: "transport" },
-            { time: "09:50", title: "起飛", description: "返回溫暖的家", type: "transport" },
+            { time: "07:00", title: "飯店早餐", description: "Comfort Hotel (06:00開始供應)", important: "建議 07:00-08:00 用餐", type: "food" },
+            { time: "08:00", title: "前往航廈", description: "步行 3 分鐘 (有雨棚直通)", type: "transport" },
+            { time: "09:00", title: "報到托運", description: "中部國際機場 (NGO)", important: "建議預留 1 小時以上", type: "transport" },
+            { time: "09:50", title: "起飛 (返回台灣)", description: "二樓有兒童遊戲區可放電", type: "transport" },
+            { time: "12:15", title: "抵達台灣", description: "甜蜜的家", type: "transport" },
           ],
           food: [
-            { name: "蝦仙貝之里", type: "伴手禮", price: "¥600~", features: ["機場必買", "試吃多"], isPrimary: true },
+            { name: "蝦仙貝之里", type: "伴手禮", price: "¥600~", features: ["試吃多", "必買"], isPrimary: true, navLink: "Ebisenbei No Sato Centrair" },
+            { name: "坂角總本舖", type: "伴手禮", price: "¥1,000~", features: ["蝦餅名店"], isPrimary: false, navLink: "Bankaku Sohonpo Centrair" },
+            { name: "手羽先真空包", type: "伴手禮", price: "¥1,200~", features: ["風來坊/山ちゃん", "可帶回國"], isPrimary: false },
+            { name: "星乃珈琲店", type: "早餐/輕食", price: "¥800~", features: ["厚鬆餅", "焗飯"], isPrimary: false, navLink: "Hoshino Coffee Centrair" },
           ],
-          tips: ["通關前可去 2F 兒童遊戲區放電。", "手羽先真空包可帶回台灣。"]
+          tips: ["Comfort Hotel 距離航廈僅 3 分鐘步行，且有雨棚。", "通關前可去 2F 兒童遊戲區短暫放電。", "手羽先(雞翅)請買「真空包」才能帶回台灣。"]
+        }
+      ];
+
+      const SHOPPING_SPOTS = [
+        { name: "MaxValu 太閤店", dist: "12分", type: "超市", tag: "24H・種類齊", note: "最推薦", navLink: "MaxValu Taiko" },
+        { name: "Donki 名站西店", dist: "6分", type: "百貨", tag: "零食藥妝", note: "必逛", navLink: "Don Quijote Nagoya Station West" },
+        { name: "Sun-Ace 龜島店", dist: "11分", type: "超市", tag: "便宜・在地", note: "非24H", navLink: "Sun-Ace Kamejima" },
+        { name: "Sugi Drug (スギ薬局)", dist: "5分", type: "藥妝", tag: "比松本清俗", note: "生活用品", navLink: "Sugi Drug Nagoya Station West" },
+        { name: "松本清 名古屋西口", dist: "6分", type: "藥妝", tag: "爆品全", note: "", navLink: "Matsumoto Kiyoshi Nagoya Station West" },
+        { name: "AEON MALL (龜島周邊)", dist: "15分", type: "商城", tag: "兒童玩具", note: "Noritake Garden", navLink: "Aeon Mall Nagoya Noritake Garden" },
+        { name: "7-11 / Lawson", dist: "1-3分", type: "超商", tag: "快速補給", note: "", navLink: "Convenience Store near Daiwa Roynet Hotel Nagoya Taiko dori Side" },
+      ];
+
+      const SHOPPING_ROUTES = [
+        { title: "最省力路線", desc: "飯店 → 超商 → 回房", tag: "累癱專用" },
+        { title: "超市採買路線", desc: "飯店 → Donki → MaxValu", tag: "補貨專用" },
+        { title: "兒童用品路線", desc: "飯店 → AEON 龜島", tag: "尿布玩具" },
+      ];
+
+      // New data for Taiko Shopping Page
+      const TAIKO_SHOPS_DATA = [
+        { name: "MaxValu 太閤店", dist: "12分", type: "超市", pros: "24 小時營業、種類齊全", note: "最推薦", navLink: "MaxValu Taiko" },
+        { name: "Sun-Ace 龜島店", dist: "11-12分", type: "超市", pros: "價格最低、在地化", note: "非 24 小時", navLink: "Sun-Ace Kamejima" },
+        { name: "Donki 名站西店", dist: "6分", type: "平價百貨", pros: "零食＋藥妝最方便", note: "必列 (至凌晨)", navLink: "Don Quijote Nagoya Station West" },
+        { name: "Sugi Drug (スギ薬局)", dist: "5分", type: "藥妝店", pros: "價格比松本清低", note: "補奶粉/濕紙巾", navLink: "Sugi Drug Nagoya Station West" },
+        { name: "松本清 名古屋西口店", dist: "6分", type: "藥妝店", pros: "爆品完整", note: "感冒藥/腸胃藥", navLink: "Matsumoto Kiyoshi Nagoya Station West" },
+        { name: "AEON 龜島", dist: "15分", type: "購物中心", pros: "兒童用品、玩具多", note: "最後補貨", navLink: "Aeon Mall Nagoya Noritake Garden" },
+        { name: "7-11/Lawson/FM", dist: "1-3分", type: "便利商店", pros: "最快速補給", note: "", navLink: "Convenience Store near Daiwa Roynet Hotel Nagoya Taiko dori Side" },
+      ];
+
+      const TAIKO_ROUTES_DATA = [
+        { title: "最省力路線 (D1、D2 晚上)", path: "飯店 → 7-11/Lawson → 回房間", desc: "適合長途飛行後或樂園日後，不想走太遠時。", tag: "累癱專用" },
+        { title: "超市採買路線 (D7 晚上)", path: "飯店 → Donki → MaxValu", desc: "步行 6-12 分鐘，一次搞定全部生活用品、零食和隔日早餐。", tag: "補貨專用" },
+        { title: "兒童用品採購路線", path: "飯店 → AEON 龜島", desc: "兒童用品（玩具、保暖衣物、大量尿布）充足。", tag: "爸媽必看" },
+      ];
+
+      const DONKI_LIST_DATA = [
+        { 
+          category: "🥇【1】零食 (1F 區域)", 
+          items: ["麵包超人餅乾盒 (兒童必買)", "麵包超人果凍杯 (可短暫常溫)", "じゃがりこ (奶油起司/沙拉)", "明治巧克力小盒", "抹茶夾心餅 (榮店常有特價)"] 
+        },
+        { 
+          category: "🍲【2】即食料理 (1F/2F 區域)", 
+          items: ["S&B 金牌咖哩 (甘口/中辛)", "日清烏龍麵杯 (孩子口味溫和)", "味噌湯組合包 (10 入輕巧版)"] 
+        },
+        { 
+          category: "💊【3】藥妝保健 (2F 區域)", 
+          items: ["Rohto 眼藥水 V5 (工作族熱銷)", "Rohto 金色眼藥水 (疲勞專用)", "PAIR 祛痘膏 (穩定好用)", "AD EX/Muhi 止癢乳液", "小孩退熱貼 (買回台最划算)"] 
+        },
+        { 
+          category: "🧸【4】兒童用品 (3F 區域)", 
+          items: ["入浴球 (泡澡驚喜球)", "麵包超人牙刷 3 入組"] 
+        }
+      ];
+
+      const FOOD_APPENDIX_DATA = [
+        {
+          day: "D1",
+          title: "抵達名古屋・名站晚餐",
+          items: [
+            { name: "味仙 名古屋站前店", cat: "晚餐", feat: ["台式拉麵", "炒飯", "可不辣"], cost: "¥1,000-¥1,800", time: "21:30-22:30", primary: true },
+            { name: "世界の山ちゃん 名駅店", cat: "晚餐", feat: ["炸雞翅", "串燒", "居酒屋風"], cost: "¥1,200-¥2,000", time: "21:30-22:30" }
+          ]
+        },
+        {
+          day: "D2",
+          title: "LEGOLAND Japan 親子樂園日",
+          items: [
+            { name: "Brick House Burger (園內)", cat: "午餐", feat: ["樂高造型漢堡", "薯條套餐"], cost: "¥1,200-¥1,800", time: "11:00-12:00", primary: true },
+            { name: "Coral Reef Pizza (園內)", cat: "午餐", feat: ["披薩", "義大利麵", "吃到飽"], cost: "¥1,800-¥2,200", time: "11:30-13:00" },
+            { name: "Chicken Diner (園內)", cat: "午餐", feat: ["炸雞", "兒童套餐"], cost: "¥1,000-¥1,500", time: "11:30-12:30" },
+            { name: "まるは食堂 名古屋港店", cat: "晚餐", feat: ["炸蝦定食", "海景座位"], cost: "¥1,500-¥2,500", time: "18:00-19:00" },
+            { name: "天むす 千壽 JR高島屋店", cat: "伴手", feat: ["炸蝦飯糰", "外帶方便"], cost: "¥600-¥1,000", time: "18:30-19:30", primary: true }
+          ]
+        },
+        {
+          day: "D3",
+          title: "白川鄉・高山老街一日遊",
+          items: [
+            { name: "味の与平 (高山)", cat: "午餐", feat: ["飛驒牛鐵板", "陶板燒"], cost: "¥2,500-¥3,500", time: "12:00-13:00" },
+            { name: "飛騨牛飯 匠家 (高山)", cat: "午餐", feat: ["飛驒牛丼", "炙壽司"], cost: "¥1,800-¥2,300", time: "12:00-13:00", primary: true },
+            { name: "丸明 高山安川店", cat: "午餐", feat: ["A5飛驒牛燒肉", "牛排"], cost: "¥2,800-¥4,500", time: "12:30-13:30", primary: true },
+            { name: "金乃こって牛", cat: "小吃", feat: ["飛驒牛壽司三貫"], cost: "¥1,200-¥1,500", time: "12:00-13:30" },
+            { name: "ぜん助", cat: "小吃", feat: ["飛驒牛串", "五平餅"], cost: "¥300-¥700", time: "12:00-13:30" }
+          ]
+        },
+        {
+          day: "D4",
+          title: "吉卜力公園・AEON 長久手",
+          items: [
+            { name: "風之谷 Café (園內)", cat: "午餐", feat: ["咖哩飯", "三明治", "限定甜點"], cost: "¥1,000-¥1,800", time: "11:30-12:30", primary: true },
+            { name: "AEON 長久手 美食街", cat: "午餐", feat: ["拉麵", "壽司", "甜點"], cost: "¥1,000-¥2,000", time: "13:00-15:00" },
+            { name: "味仙 名古屋站前店", cat: "晚餐", feat: ["台式拉麵", "炒飯", "可不辣"], cost: "¥1,000-¥1,800", time: "18:00-19:00" },
+            { name: "世界の山ちゃん 名駅店", cat: "晚餐", feat: ["炸雞翅", "串燒"], cost: "¥1,200-¥2,000", time: "18:00-19:00" }
+          ]
+        },
+        {
+          day: "D5",
+          title: "三井 Outlet Park + 名花之里",
+          items: [
+            { name: "Italian Kitchen VANSAN", cat: "午餐", feat: ["義大利麵", "披薩", "親子友善"], cost: "¥1,200-¥2,000", time: "12:00-13:30", primary: true },
+            { name: "まるは食堂 長島店", cat: "午餐", feat: ["炸蝦定食", "白飯可續"], cost: "¥1,500-¥2,500", time: "12:00-13:30" },
+            { name: "矢場とん 長島店", cat: "午餐", feat: ["味噌炸豬排", "可選兒童餐"], cost: "¥1,500-¥2,000", time: "12:30-14:00", primary: true },
+            { name: "名花之里 Café", cat: "下午茶", feat: ["燈會限定甜點", "熱飲"], cost: "¥800-¥1,500", time: "15:30-16:30" },
+            { name: "まるは食堂 中部機場店", cat: "晚餐", feat: ["炸蝦定食", "海景座位"], cost: "¥1,500-¥3,000", time: "20:30-21:30" },
+            { name: "星乃珈琲店 機場店", cat: "晚餐", feat: ["鬆餅", "焗飯", "咖啡"], cost: "¥1,000-¥1,800", time: "20:30-21:30" }
+          ]
+        },
+        {
+          day: "D6",
+          title: "牧歌之里・溫泉體驗日",
+          items: [
+            { name: "ふる里亭 (牧歌の里)", cat: "午餐", feat: ["牛奶鍋", "咖哩飯", "飛驒牛"], cost: "¥1,200-¥2,000", time: "12:00-13:00", primary: true },
+            { name: "レストラン まきばの館", cat: "午餐", feat: ["洋食", "漢堡排", "甜點"], cost: "¥1,000-¥1,800", time: "12:00-13:00" },
+            { name: "牧華溫泉 (まきばの湯)", cat: "休息", feat: ["輕食", "飲料", "自販機"], cost: "-", time: "15:00-16:30" },
+            { name: "世界の山ちゃん 名駅店", cat: "晚餐", feat: ["炸雞翅", "串燒"], cost: "¥1,200-¥2,000", time: "19:00-20:00" },
+            { name: "味仙 名古屋站前店", cat: "晚餐", feat: ["台式拉麵", "炒飯"], cost: "¥1,000-¥1,800", time: "19:00-20:00" }
+          ]
+        },
+        {
+          day: "D7",
+          title: "科學館・大須商店街",
+          items: [
+            { name: "喫茶リッチ (Kissa Ritchi)", cat: "早餐", feat: ["名古屋早餐", "吐司套餐"], cost: "¥800-¥1,200", time: "08:00-09:00" },
+            { name: "サガミ 栄店", cat: "午餐", feat: ["烏龍麵", "味噌豬排定食"], cost: "¥1,200-¥1,800", time: "12:00-13:00" },
+            { name: "コメダ珈琲 栄科學館前", cat: "午餐", feat: ["咖啡", "三明治", "甜點"], cost: "¥800-¥1,500", time: "12:00-13:30" },
+            { name: "しら河 栄ガスビル店", cat: "晚餐", feat: ["鰻魚三吃", "清爽", "孩子友善"], cost: "¥3,000-¥4,000", time: "17:30-19:00", primary: true },
+            { name: "ひつまぶし備長", cat: "晚餐", feat: ["高島屋", "出餐快"], cost: "¥3,000-¥4,500", time: "17:30-19:00", primary: true }
+          ]
+        },
+        {
+          day: "D8",
+          title: "回程日 (中部國際機場)",
+          items: [
+            { name: "若草咖啡廳", cat: "早餐", feat: ["吐司", "蛋沙拉", "咖啡"], cost: "¥800-¥1,200", time: "07:00-08:00" },
+            { name: "矢場とん 中部機場店", cat: "午餐", feat: ["味噌炸豬排", "出餐快"], cost: "¥1,500-¥2,000", time: "10:00-11:00" },
+            { name: "まるは食堂 中部機場店", cat: "午餐", feat: ["炸蝦定食", "海景座位"], cost: "¥1,500-¥3,000", time: "10:00-11:00" }
+          ]
         }
       ];
 
@@ -244,9 +411,10 @@
           green: 'bg-ghibli-green/10 text-ghibli-green border-ghibli-green/20',
           orange: 'bg-orange-100 text-orange-700 border-orange-200',
           blue: 'bg-blue-50 text-blue-700 border-blue-200',
+          purple: 'bg-purple-50 text-purple-700 border-purple-200',
         };
         return (
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${colorClasses[color]} mr-2 inline-flex items-center`}>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${colorClasses[color]} mr-1 mb-1 inline-flex items-center`}>
             {children}
           </span>
         );
@@ -519,6 +687,457 @@
                       </div>
                       <Plane className="absolute -right-4 -bottom-4 text-white/10 w-32 h-32 rotate-12" />
                   </div>
+                </div>
+
+                {/* Appendix Section */}
+                <div className="mt-6 px-6 pb-8 space-y-3">
+                  <h3 className="font-bold text-ghibli-brown text-lg px-1">實用附錄</h3>
+                  
+                  {/* Card 1: Transport Tickets */}
+                  <button 
+                    onClick={() => setActiveTab('TRANSPORT')}
+                    className="w-full bg-white rounded-xl p-4 shadow-sm border border-ghibli-green/10 flex items-center gap-4 hover:shadow-md transition-all group"
+                  >
+                    <div className="bg-blue-50 p-2.5 rounded-full text-blue-500">
+                      <Ticket size={20} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h4 className="font-bold text-ghibli-brown">交通票券</h4>
+                      <p className="text-xs text-gray-500">名古屋附錄篇</p>
+                    </div>
+                    <ArrowRight size={16} className="text-gray-300 group-hover:text-ghibli-orange transition-colors" />
+                  </button>
+
+                  {/* Card 2: Food List */}
+                  <button 
+                    onClick={() => setActiveTab('FOOD')}
+                    className="w-full bg-white rounded-xl p-4 shadow-sm border border-ghibli-green/10 flex items-center gap-4 hover:shadow-md transition-all group"
+                  >
+                    <div className="bg-orange-50 p-2.5 rounded-full text-orange-500">
+                      <Table size={20} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h4 className="font-bold text-ghibli-brown">美食附錄</h4>
+                      <p className="text-xs text-gray-500">完整表格版｜含建議時段</p>
+                    </div>
+                    <ArrowRight size={16} className="text-gray-300 group-hover:text-ghibli-orange transition-colors" />
+                  </button>
+
+                  {/* Card 3: Complete Map List */}
+                  <button 
+                    onClick={() => setActiveTab('FULL_MAP')}
+                    className="w-full bg-white rounded-xl p-4 shadow-sm border border-ghibli-green/10 flex items-center gap-4 hover:shadow-md transition-all group"
+                  >
+                    <div className="bg-purple-50 p-2.5 rounded-full text-purple-500">
+                      <Map size={20} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h4 className="font-bold text-ghibli-brown">完整購物地圖</h4>
+                      <p className="text-xs text-gray-500">超市＋藥妝＋平價店清單</p>
+                    </div>
+                    <ArrowRight size={16} className="text-gray-300 group-hover:text-ghibli-orange transition-colors" />
+                  </button>
+
+                  {/* Card 4: Taiko Shopping */}
+                  <button 
+                    onClick={() => setActiveTab('TAIKO_SHOPPING')}
+                    className="w-full bg-white rounded-xl p-4 shadow-sm border border-ghibli-green/10 flex items-center gap-4 hover:shadow-md transition-all group"
+                  >
+                    <div className="bg-pink-50 p-2.5 rounded-full text-pink-500">
+                      <Store size={20} />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h4 className="font-bold text-ghibli-brown">名古屋站太閤通口</h4>
+                      <p className="text-xs text-gray-500">超市＆大型平價商店總整理</p>
+                    </div>
+                    <ArrowRight size={16} className="text-gray-300 group-hover:text-ghibli-orange transition-colors" />
+                  </button>
+                </div>
+
+              </div>
+            )}
+
+            {/* Transport Tickets View */}
+            {activeTab === 'TRANSPORT' && (
+              <div className="animate-fade-in pb-24 bg-ghibli-cream">
+                 <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
+                  <button 
+                    onClick={() => setActiveTab('HOME')}
+                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
+                  >
+                    <ChevronLeft className="text-ghibli-brown" />
+                  </button>
+                  <div>
+                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">交通票券總覽</h1>
+                    <span className="text-xs text-gray-500">名古屋附錄篇</span>
+                  </div>
+                </div>
+                
+                <div className="p-4 space-y-6">
+                  {/* Intro */}
+                  <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-700 flex gap-2 items-start border border-blue-100 shadow-sm">
+                     <Info size={16} className="mt-0.5 shrink-0"/>
+                     <p>以下附錄已完全依您的<strong>「最新版行程順序」</strong>重新整理，並整合了交通色塊，方便您快速識別路線。</p>
+                  </div>
+
+                  {/* Child Rules Table */}
+                  <Card>
+                    <h3 className="font-bold text-ghibli-brown mb-3 flex items-center gap-2">
+                        <Ticket size={18} className="text-ghibli-green"/> 4 歲幼童票券規則
+                    </h3>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left">
+                            <thead className="bg-gray-50 text-gray-700 font-bold border-b">
+                                <tr>
+                                    <th className="p-2 whitespace-nowrap">交通方式</th>
+                                    <th className="p-2 whitespace-nowrap text-center">需票?</th>
+                                    <th className="p-2 whitespace-nowrap">備註</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                <tr><td className="p-2 font-medium text-gray-700">地鐵全線</td><td className="p-2 text-center text-green-600 font-bold">免</td><td className="p-2 text-gray-500">不保證座位</td></tr>
+                                <tr><td className="p-2 font-medium text-gray-700">あおなみ線</td><td className="p-2 text-center text-green-600 font-bold">免</td><td className="p-2 text-gray-500">-</td></tr>
+                                <tr><td className="p-2 font-medium text-gray-700">リニモ</td><td className="p-2 text-center text-green-600 font-bold">免</td><td className="p-2 text-gray-500">-</td></tr>
+                                <tr><td className="p-2 font-medium text-gray-700">名鐵普通車</td><td className="p-2 text-center text-green-600 font-bold">免</td><td className="p-2 text-gray-500">可共坐</td></tr>
+                                <tr><td className="p-2 font-medium text-red-600">名鐵 µSKY 指定席</td><td className="p-2 text-center text-red-500 font-bold">需</td><td className="p-2 text-gray-500">因佔位</td></tr>
+                                <tr><td className="p-2 font-medium text-gray-700">KKday 巴士團</td><td className="p-2 text-center text-gray-500">含</td><td className="p-2 text-gray-500">團費多包含</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                  </Card>
+
+                  {/* Daily Schedule Table */}
+                  <Card>
+                     <h3 className="font-bold text-ghibli-brown mb-3 flex items-center gap-2">
+                        <Calendar size={18} className="text-ghibli-orange"/> 新版行程 × 交通票券
+                    </h3>
+                    <div className="overflow-x-auto -mx-2">
+                         <table className="w-full text-xs text-left min-w-[500px]">
+                            <thead className="bg-ghibli-green/10 text-ghibli-brown font-bold border-b border-ghibli-green/20">
+                                <tr>
+                                    <th className="p-2">日次</th>
+                                    <th className="p-2">路線色塊</th>
+                                    <th className="p-2">票券 / 價格</th>
+                                    <th className="p-2">重點</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                <tr>
+                                    <td className="p-2 font-bold text-center">D1</td>
+                                    <td className="p-2"><span className="bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold">名鐵 µSKY</span></td>
+                                    <td className="p-2">指定席券 ¥1,250</td>
+                                    <td className="p-2 text-gray-500">若佔位需票</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 font-bold text-center">D2</td>
+                                    <td className="p-2"><span className="bg-blue-800 text-white px-1.5 py-0.5 rounded font-bold">あおなみ線</span></td>
+                                    <td className="p-2">一日券 ¥870</td>
+                                    <td className="p-2 text-gray-500">往返划算</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 font-bold text-center">D3</td>
+                                    <td className="p-2"><span className="bg-orange-500 text-white px-1.5 py-0.5 rounded font-bold">名鐵巴士團</span></td>
+                                    <td className="p-2">KKday (含)</td>
+                                    <td className="p-2 text-gray-500">銀時計集合</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 font-bold text-center">D4</td>
+                                    <td className="p-2">
+                                        <span className="bg-yellow-400 text-white px-1.5 py-0.5 rounded font-bold mr-1">東山</span>
+                                        <span className="bg-green-500 text-white px-1.5 py-0.5 rounded font-bold">リニモ</span>
+                                    </td>
+                                    <td className="p-2">地鐵券 + リニモ</td>
+                                    <td className="p-2 text-gray-500">吉卜力需預約</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 font-bold text-center">D5</td>
+                                    <td className="p-2"><span className="bg-indigo-600 text-white px-1.5 py-0.5 rounded font-bold">名鐵套票</span></td>
+                                    <td className="p-2">ゆったり ¥3,700</td>
+                                    <td className="p-2 text-gray-500">含門票+金券</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 font-bold text-center">D6</td>
+                                    <td className="p-2"><span className="bg-gray-500 text-white px-1.5 py-0.5 rounded font-bold">滑雪團</span></td>
+                                    <td className="p-2">KKday (含)</td>
+                                    <td className="p-2 text-gray-500">含溫泉</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 font-bold text-center">D7</td>
+                                    <td className="p-2">
+                                        <span className="bg-blue-500 text-white px-1 py-0.5 rounded mr-1">鶴</span>
+                                        <span className="bg-yellow-400 text-white px-1 py-0.5 rounded mr-1">東</span>
+                                        <span className="bg-red-500 text-white px-1 py-0.5 rounded">名</span>
+                                    </td>
+                                    <td className="p-2">地鐵 + µSKY</td>
+                                    <td className="p-2 text-gray-500">移宿機場</td>
+                                </tr>
+                            </tbody>
+                         </table>
+                    </div>
+                  </Card>
+
+                  {/* Tips */}
+                  <div className="space-y-4">
+                      <h3 className="font-bold text-ghibli-brown px-1 flex items-center gap-2">
+                          <AlertCircle size={18} /> 交通購票與動線提醒
+                      </h3>
+                      
+                      <Card className="border-l-4 border-red-400">
+                          <h4 className="font-bold text-red-500 text-sm mb-1">名鐵 µSKY (D1/D7)</h4>
+                          <ul className="text-xs text-gray-600 list-disc list-inside space-y-1">
+                              <li>購買地點: 機場 2F 名鐵售票窗口 (支援中文)</li>
+                              <li>建議 D1 抵達時可同時預購 D7 回程票</li>
+                          </ul>
+                      </Card>
+
+                      <Card className="border-l-4 border-blue-400">
+                          <h4 className="font-bold text-blue-500 text-sm mb-1">樂高樂園 (D2)</h4>
+                          <p className="text-xs text-gray-600">あおなみ線一日券：只要 2 次以上進出站（來回）就會划算。</p>
+                      </Card>
+
+                      <Card className="border-l-4 border-green-400">
+                          <h4 className="font-bold text-green-600 text-sm mb-1">吉卜力公園 (D4)</h4>
+                          <ul className="text-xs text-gray-600 list-disc list-inside space-y-1">
+                              <li>門票必須事前預約，現場不販售</li>
+                              <li>園內多處禁止推車，入口有免費寄放區</li>
+                          </ul>
+                      </Card>
+                      
+                       <Card className="border-l-4 border-indigo-400">
+                          <h4 className="font-bold text-indigo-600 text-sm mb-1">名花之里 (D5)</h4>
+                          <p className="text-xs text-gray-600">套票「ゆったりパック」已包含夜間入場門票和金券 ¥1,000。</p>
+                      </Card>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Food List View */}
+            {activeTab === 'FOOD' && (
+              <div className="animate-fade-in pb-24 bg-ghibli-cream">
+                 <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
+                  <button 
+                    onClick={() => setActiveTab('HOME')}
+                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
+                  >
+                    <ChevronLeft className="text-ghibli-brown" />
+                  </button>
+                  <div>
+                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">美食附錄</h1>
+                    <span className="text-xs text-gray-500">完整表格版｜含建議時段</span>
+                  </div>
+                </div>
+                
+                <div className="p-4 space-y-6">
+                  {/* Intro */}
+                  <div className="bg-orange-50 p-3 rounded-lg text-sm text-orange-700 flex gap-2 items-start border border-orange-100 shadow-sm">
+                     <Info size={16} className="mt-0.5 shrink-0"/>
+                     <p>❗ 溫馨提醒: 所有列出的餐廳均為<strong>親子友善</strong>，大部分支援信用卡與電子支付。</p>
+                  </div>
+
+                  {FOOD_APPENDIX_DATA.map((dayData, index) => (
+                    <Card key={index} className="overflow-hidden">
+                       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100">
+                          <span className="bg-ghibli-brown text-white text-xs font-bold px-2 py-1 rounded">{dayData.day}</span>
+                          <h3 className="font-bold text-ghibli-brown">{dayData.title}</h3>
+                       </div>
+                       
+                       <div className="space-y-4">
+                         {dayData.items.map((item, i) => (
+                           <div key={i} className={`relative pl-3 ${i !== dayData.items.length - 1 ? 'border-b border-dashed border-gray-100 pb-3' : ''}`}>
+                             <div className={`absolute left-0 top-1.5 w-1 h-8 rounded-full ${item.primary ? 'bg-orange-400' : 'bg-gray-200'}`}></div>
+                             
+                             <div className="flex justify-between items-start">
+                               <div>
+                                 <h4 className={`text-sm ${item.primary ? 'font-bold text-ghibli-brown' : 'font-medium text-gray-700'}`}>
+                                   {item.name}
+                                 </h4>
+                                 <div className="text-xs text-gray-500 mt-0.5">{item.cat}</div>
+                               </div>
+                               <div className="text-right shrink-0">
+                                  <div className="flex items-center justify-end gap-1 text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded mb-1">
+                                    <Clock size={10} /> {item.time}
+                                  </div>
+                                  <div className="text-xs font-mono font-medium text-gray-600">{item.cost}</div>
+                               </div>
+                             </div>
+                             
+                             <div className="mt-2 flex flex-wrap gap-1">
+                               {item.feat.map((f, fi) => (
+                                 <Tag key={fi} color={item.primary ? 'orange' : 'green'}>{f}</Tag>
+                               ))}
+                             </div>
+                           </div>
+                         ))}
+                       </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Complete Map List View */}
+            {activeTab === 'FULL_MAP' && (
+              <div className="animate-fade-in pb-24 bg-ghibli-cream">
+                 <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
+                  <button 
+                    onClick={() => setActiveTab('HOME')}
+                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
+                  >
+                    <ChevronLeft className="text-ghibli-brown" />
+                  </button>
+                  <div>
+                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">完整購物地圖</h1>
+                    <span className="text-xs text-gray-500">超市＋藥妝＋平價店清單</span>
+                  </div>
+                </div>
+
+                <div className="px-6 py-6">
+                  <div className="space-y-6">
+                    {/* Routes */}
+                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-ghibli-orange/10 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 w-20 h-20 bg-orange-50 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+                       <h4 className="font-bold text-ghibli-green text-sm mb-4 flex items-center gap-2 relative z-10">
+                         <Footprints size={18} /> 最佳補給路線建議
+                       </h4>
+                       <div className="space-y-4 relative z-10">
+                         {SHOPPING_ROUTES.map((route, idx) => (
+                           <div key={idx} className="flex flex-col gap-1 text-sm border-b border-gray-50 last:border-0 pb-2 last:pb-0">
+                             <div className="flex items-center justify-between">
+                               <span className="font-bold text-ghibli-brown">{route.title}</span>
+                               <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded">{route.tag}</span>
+                             </div>
+                             <span className="text-gray-500 text-xs">{route.desc}</span>
+                           </div>
+                         ))}
+                       </div>
+                    </div>
+
+                    {/* Shops List */}
+                    <div>
+                      <h4 className="font-bold text-ghibli-brown text-sm mb-3 ml-1">周邊店家一覽</h4>
+                      <div className="grid gap-3">
+                        {SHOPPING_SPOTS.map((shop, idx) => (
+                          <div key={idx} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-l-ghibli-green/30 hover:border-l-ghibli-green transition-all">
+                             <div className="flex-1">
+                               <div className="flex items-center gap-2 mb-1">
+                                 <span className="font-bold text-ghibli-brown">{shop.name}</span>
+                                 <span className="text-[10px] bg-ghibli-cream text-ghibli-brown px-1.5 py-0.5 rounded font-mono">{shop.dist}</span>
+                               </div>
+                               <div className="flex items-center gap-2 flex-wrap mt-1">
+                                 <span className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">{shop.tag}</span>
+                                 {shop.note && <span className="text-[10px] text-red-500 font-medium">• {shop.note}</span>}
+                               </div>
+                             </div>
+                             <button onClick={() => handleNavClick(shop.navLink)} className="p-2 text-blue-500 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors ml-2 shrink-0">
+                               <Navigation size={18} />
+                             </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Taiko Shopping View */}
+            {activeTab === 'TAIKO_SHOPPING' && (
+              <div className="animate-fade-in pb-24 bg-ghibli-cream">
+                 <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4 flex items-center gap-4">
+                  <button 
+                    onClick={() => setActiveTab('HOME')}
+                    className="p-2 -ml-2 rounded-full hover:bg-stone-200 transition-colors"
+                  >
+                    <ChevronLeft className="text-ghibli-brown" />
+                  </button>
+                  <div>
+                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">名古屋站太閤通口</h1>
+                    <span className="text-xs text-gray-500">超市＆大型平價商店總整理</span>
+                  </div>
+                </div>
+
+                <div className="px-6 py-6 space-y-8">
+                  
+                  {/* Intro */}
+                  <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-700 flex gap-2 items-start border border-blue-100 shadow-sm">
+                     <Info size={16} className="mt-0.5 shrink-0"/>
+                     <p>以下名單皆是<strong>從您飯店步行可達</strong>或地鐵一站內，非常適合您在 D1、D2、D7 晚上進行補給。</p>
+                  </div>
+
+                  {/* Shops Table (as cards) */}
+                  <div>
+                    <h3 className="font-bold text-ghibli-brown text-lg flex items-center gap-2 mb-4">
+                      <Store size={20} className="text-pink-500"/> 補給地圖總覽
+                    </h3>
+                    <div className="grid gap-3">
+                        {TAIKO_SHOPS_DATA.map((shop, idx) => (
+                          <div key={idx} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border-l-4 border-l-pink-300/30 hover:border-l-pink-400 transition-all">
+                             <div className="flex-1">
+                               <div className="flex items-center gap-2 mb-1">
+                                 <span className="font-bold text-ghibli-brown">{shop.name}</span>
+                                 <span className="text-[10px] bg-ghibli-cream text-ghibli-brown px-1.5 py-0.5 rounded font-mono">{shop.dist}</span>
+                               </div>
+                               <div className="text-xs text-gray-600 mb-1">{shop.pros}</div>
+                               <div className="flex items-center gap-2 flex-wrap mt-1">
+                                 <span className="text-[10px] text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">{shop.type}</span>
+                                 {shop.note && <span className="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 py-0.5 rounded">• {shop.note}</span>}
+                               </div>
+                             </div>
+                             <button onClick={() => handleNavClick(shop.navLink)} className="p-2 text-blue-500 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors ml-2 shrink-0">
+                               <Navigation size={18} />
+                             </button>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Routes */}
+                  <div className="bg-white rounded-2xl p-5 shadow-sm border border-ghibli-orange/10 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 w-20 h-20 bg-orange-50 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+                       <h3 className="font-bold text-ghibli-green text-lg mb-4 flex items-center gap-2 relative z-10">
+                         <Footprints size={20} /> 最佳補給路線建議
+                       </h3>
+                       <div className="space-y-4 relative z-10">
+                         {TAIKO_ROUTES_DATA.map((route, idx) => (
+                           <div key={idx} className="flex flex-col gap-1 text-sm border-b border-gray-50 last:border-0 pb-4 last:pb-0">
+                             <div className="flex items-center justify-between mb-1">
+                               <span className="font-bold text-ghibli-brown text-base">{route.title}</span>
+                               {route.tag && <span className="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded">{route.tag}</span>}
+                             </div>
+                             <div className="flex items-center gap-2 text-xs font-mono bg-gray-50 p-2 rounded text-gray-700 mb-1">
+                                <MapPin size={12}/> {route.path}
+                             </div>
+                             <span className="text-gray-500 text-xs leading-relaxed">{route.desc}</span>
+                           </div>
+                         ))}
+                       </div>
+                  </div>
+
+                  {/* Donki List */}
+                  <div className="bg-yellow-50/80 rounded-2xl p-5 shadow-sm border border-yellow-200">
+                    <h3 className="font-bold text-yellow-800 text-lg mb-2 flex items-center gap-2">
+                       <ShoppingBag size={20} /> DONKI 快速採買懶人包
+                    </h3>
+                    <p className="text-xs text-yellow-700/80 mb-4">榮本店/名站西店皆適用，20 分鐘快速採購清單。</p>
+                    
+                    <div className="space-y-4">
+                      {DONKI_LIST_DATA.map((category, idx) => (
+                        <div key={idx} className="bg-white rounded-xl p-3 shadow-sm">
+                           <h4 className="font-bold text-ghibli-brown text-sm mb-2 pb-1 border-b border-gray-100">{category.category}</h4>
+                           <ul className="space-y-2">
+                             {category.items.map((item, i) => (
+                               <li key={i} className="flex items-start gap-2 text-xs text-gray-700">
+                                 <CheckCircle size={14} className="text-yellow-500 shrink-0 mt-0.5"/>
+                                 <span>{item}</span>
+                               </li>
+                             ))}
+                           </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
               </div>
             )}
