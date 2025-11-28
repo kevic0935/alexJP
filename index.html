@@ -75,7 +75,8 @@
         MapPin, Utensils, AlertCircle, Plane, Bed, Wallet, 
         ChevronLeft, Calendar, Info, Navigation, ArrowRight,
         ShoppingBag, Footprints, Store, Ticket, Table, TrainFront, Map,
-        CheckCircle, XCircle, Clock, Banknote, ClipboardCheck
+        CheckCircle, XCircle, Clock, Banknote, ClipboardCheck,
+        ArrowRightLeft, RefreshCw, Coins, Calculator
       } from 'lucide-react';
       import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -426,6 +427,88 @@
         </div>
       );
 
+      // --- Currency Converter Component ---
+      const CurrencyConverter = () => {
+        const [rate, setRate] = useState(0.215); // 近期平均匯率
+        const [amount, setAmount] = useState('');
+        const [loading, setLoading] = useState(false);
+        const [lastTime, setLastTime] = useState('');
+
+        useEffect(() => {
+          fetchRate();
+        }, []);
+
+        const fetchRate = () => {
+          setLoading(true);
+          // 使用免費公開 API (Base: JPY)
+          fetch('https://api.exchangerate-api.com/v4/latest/JPY')
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.rates && data.rates.TWD) {
+                setRate(data.rates.TWD);
+                const now = new Date();
+                setLastTime(`${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`);
+              }
+            })
+            .catch(err => console.error("Rate fetch error", err))
+            .finally(() => setLoading(false));
+        };
+
+        const twd = amount ? Math.floor(parseFloat(amount) * rate) : 0;
+
+        return (
+          <div className="px-4">
+            <Card className="border-l-4 border-yellow-400 bg-gradient-to-br from-white to-yellow-50/30">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="flex items-center gap-2 font-bold text-yellow-800">
+                  <Coins size={20} className="text-yellow-600" /> 即時匯率換算
+                </h3>
+                <button 
+                  onClick={fetchRate}
+                  className={`p-1.5 rounded-full bg-white text-yellow-600 shadow-sm border border-yellow-100 active:scale-95 transition-all ${loading ? 'animate-spin' : ''}`}
+                >
+                  <RefreshCw size={14} />
+                </button>
+              </div>
+
+              <div className="bg-white rounded-xl p-3 border border-yellow-100 shadow-sm mb-4 flex justify-between items-center">
+                 <div>
+                    <div className="text-[10px] text-gray-500 font-bold tracking-wider mb-0.5">目前匯率 (JPY)</div>
+                    <div className="font-mono font-bold text-xl text-yellow-600">
+                      0.{rate.toString().split('.')[1]?.substring(0,4) || '2150'}
+                    </div>
+                 </div>
+                 <div className="text-right">
+                    <div className="text-[10px] text-gray-400">1 JPY ≈ {rate} TWD</div>
+                    <div className="text-[10px] text-gray-400">1 TWD ≈ {(1/rate).toFixed(2)} JPY</div>
+                    {lastTime && <div className="text-[10px] text-gray-300 mt-0.5">更新於 {lastTime}</div>}
+                 </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <label className="text-[10px] font-bold text-gray-400 mb-1 block ml-1">日幣 (JPY)</label>
+                  <input 
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="¥"
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-lg font-bold font-mono text-gray-700 focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-50 transition-all placeholder:text-gray-300"
+                  />
+                </div>
+                <ArrowRightLeft className="text-yellow-300 mt-5 shrink-0" size={20} />
+                <div className="flex-1">
+                  <label className="text-[10px] font-bold text-gray-400 mb-1 block ml-1">台幣 (TWD)</label>
+                  <div className="w-full bg-yellow-100/50 border border-yellow-200 rounded-xl px-3 py-2 text-lg font-bold font-mono text-yellow-800 h-[46px] flex items-center">
+                    ${twd.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        );
+      };
+
       // --- Tools View ---
 
       const ToolsView = () => {
@@ -442,6 +525,8 @@
           <div className="space-y-6 pb-24">
             <h2 className="text-2xl font-bold text-ghibli-brown px-4 pt-4">旅遊工具箱</h2>
             
+            {/* Currency Converter Removed from here, moved to dedicated page */}
+            
             <div className="px-4 grid grid-cols-2 gap-4">
               <Card className="flex flex-col items-center justify-center py-6 gap-2">
                   <Plane className="w-8 h-8 text-ghibli-green" />
@@ -455,7 +540,7 @@
               </Card>
             </div>
 
-            {/* New Pre-trip Card */}
+            {/* Pre-trip Card */}
             <div className="px-4">
               <Card className="border-l-4 border-indigo-400">
                   <h3 className="flex items-center gap-2 font-bold text-indigo-600 mb-3">
@@ -1182,6 +1267,26 @@
                 </div>
               </div>
             )}
+            
+            {/* Currency View (Dedicated Page) */}
+            {activeTab === 'CURRENCY' && (
+              <div className="animate-fade-in bg-ghibli-cream min-h-screen pb-24">
+                <div className="sticky top-0 z-10 bg-ghibli-cream/95 backdrop-blur-sm border-b border-stone-200 px-4 py-4">
+                    <h1 className="text-lg font-bold text-ghibli-brown leading-tight">匯率換算</h1>
+                    <span className="text-xs text-gray-500">即時 JPY 轉 TWD 計算機</span>
+                </div>
+                <div className="pt-8">
+                   <CurrencyConverter />
+                   <div className="px-6 mt-8">
+                      <div className="bg-white rounded-2xl p-6 text-center text-gray-400 text-sm">
+                         <Calculator size={48} className="mx-auto mb-4 opacity-20" />
+                         <p>請輸入日幣金額，自動換算為台幣。</p>
+                         <p className="text-xs mt-2 opacity-60">匯率來源：ExchangeRate-API (免費版)</p>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            )}
 
             {/* Tools View */}
             {activeTab === 'TOOLS' && (
@@ -1201,11 +1306,19 @@
               </button>
               <div className="w-px h-8 bg-gray-200"></div>
               <button 
+                  onClick={() => setActiveTab('CURRENCY')}
+                  className={`flex-1 flex flex-col items-center py-2 rounded-full transition-all ${activeTab === 'CURRENCY' ? 'text-yellow-600 bg-yellow-50' : 'text-gray-400'}`}
+              >
+                  <Coins size={20} />
+                  <span className="text-[10px] font-bold mt-0.5">匯率</span>
+              </button>
+              <div className="w-px h-8 bg-gray-200"></div>
+              <button 
                   onClick={() => setActiveTab('TOOLS')}
                   className={`flex-1 flex flex-col items-center py-2 rounded-full transition-all ${activeTab === 'TOOLS' ? 'text-ghibli-orange bg-orange-50' : 'text-gray-400'}`}
               >
                   <MapPin size={20} />
-                  <span className="text-[10px] font-bold mt-0.5">工具箱</span>
+                  <span className="text-[10px] font-bold mt-0.5">工具</span>
               </button>
             </div>
           </div>
