@@ -70,12 +70,13 @@
       import React, { useState, useEffect } from 'react';
       import { createRoot } from 'react-dom/client';
       import { 
-        Sun, Cloud, Snowflake, CloudRain, 
+        Sun, Cloud, Snowflake, CloudRain, CloudLightning, CloudFog,
         MapPin, Utensils, AlertCircle, Plane, Bed, Wallet, 
         ChevronLeft, Calendar, Info, Navigation, ArrowRight,
         ShoppingBag, Footprints, Store, Ticket, Table, TrainFront, Map,
         CheckCircle, XCircle, Clock, Banknote, ClipboardCheck,
-        ArrowRightLeft, RefreshCw, Coins, Calculator, ExternalLink
+        ArrowRightLeft, RefreshCw, Coins, Calculator, ExternalLink,
+        Thermometer
       } from 'lucide-react';
       import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -283,6 +284,82 @@
 
       const openGoogleMaps = (location) => {
         window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
+      };
+
+      const WeatherWidget = () => {
+        const [weather, setWeather] = useState(null);
+        const [loading, setLoading] = useState(true);
+
+        useEffect(() => {
+          // Nagoya Coordinates: 35.1815, 136.9066
+          // API: Open-Meteo
+          const fetchWeather = async () => {
+            try {
+              const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=35.1815&longitude=136.9066&current=temperature_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo');
+              const data = await res.json();
+              setWeather(data);
+            } catch (e) {
+              console.error("Weather fetch failed", e);
+            } finally {
+              setLoading(false);
+            }
+          };
+          fetchWeather();
+        }, []);
+
+        const getWeatherIcon = (code) => {
+          if (code <= 1) return <Sun size={24} className="text-orange-500" />;
+          if (code <= 3) return <Cloud size={24} className="text-gray-400" />;
+          if (code <= 48) return <CloudFog size={24} className="text-gray-400" />;
+          if (code <= 67) return <CloudRain size={24} className="text-blue-400" />;
+          if (code <= 77) return <Snowflake size={24} className="text-blue-300" />;
+          if (code <= 82) return <CloudRain size={24} className="text-blue-500" />;
+          if (code <= 86) return <Snowflake size={24} className="text-blue-300" />;
+          if (code <= 99) return <CloudLightning size={24} className="text-purple-500" />;
+          return <Sun size={24} className="text-orange-500" />;
+        };
+
+        if (loading) return (
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg mb-4 animate-pulse h-32 flex items-center justify-center">
+             載入天氣資訊...
+          </div>
+        );
+
+        if (!weather) return null;
+
+        const current = weather.current;
+        const daily = weather.daily;
+
+        return (
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg mb-4">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-3">
+                {getWeatherIcon(current.weather_code)}
+                <div>
+                  <div className="text-3xl font-bold">{Math.round(current.temperature_2m)}°C</div>
+                  <div className="text-xs opacity-90">名古屋・即時</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="flex items-center gap-1 justify-end">
+                  <Thermometer size={14} /> 體感 {Math.round(current.apparent_temperature)}°C
+                </div>
+                <div className="text-xs opacity-75 mt-1">一週預報 →</div>
+              </div>
+            </div>
+
+            <div className="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
+              {daily.time.map((t, i) => (
+                <div key={i} className="flex flex-col items-center min-w-[3.5rem] bg-white/20 rounded-lg p-2 backdrop-blur-sm">
+                  <span className="text-[10px] opacity-90">{new Date(t).toLocaleDateString('zh-TW', {weekday: 'short'})}</span>
+                  <div className="my-1 scale-75">{getWeatherIcon(daily.weather_code[i])}</div>
+                  <span className="text-xs font-bold">{Math.round(daily.temperature_2m_max[i])}°</span>
+                  <span className="text-[10px] opacity-75">{Math.round(daily.temperature_2m_min[i])}°</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
       };
 
       const DayCard = ({ day, onClick }) => (
@@ -614,20 +691,27 @@
               <h2 className="text-lg font-bold text-blue-700 mb-2">每日交通總表</h2>
               <div className="space-y-3">
                 {[
-                  {d:"D1", route:"名鐵 µSKY", ticket:"指定席券", price:"¥1250", color:"bg-red-100 text-red-800", tip: "若佔位需購兒童票 (不佔位免費)"},
-                  {d:"D2", route:"あおなみ線", ticket:"一日券", price:"¥870", color:"bg-blue-100 text-blue-800", tip: "樂園入口可停推車"},
-                  {d:"D3", route:"KKday 巴士", ticket:"團費包含", price:"-", color:"bg-orange-100 text-orange-800", tip: "幼童含在團費中 (有座位)"},
-                  {d:"D4", route:"東山線+Linimo", ticket:"24h券+單程", price:"¥1140", color:"bg-yellow-100 text-yellow-800", tip: "大倉庫內禁推車 (可寄放)"},
-                  {d:"D5", route:"名鐵巴士", ticket:"套票", price:"¥3700", color:"bg-purple-100 text-purple-800", tip: "套票含¥1000金券"},
+                  {d:"D1", route:"名鐵 µSKY", ticket:"指定席券", price:"¥1250", color:"bg-red-100 text-red-800", tip: "若佔位需購兒童票 (不佔位免費)。\n建議抵達後去人工櫃台購票，可順便劃位回程。"},
+                  {d:"D2", route:"あおなみ線", ticket:"一日券", price:"¥870", color:"bg-blue-100 text-blue-800", tip: "樂園入口可停推車 (不可入園)。\n一日券只要來回一趟+中途下車一次就划算。"},
+                  {d:"D3", route:"KKday 巴士", ticket:"團費包含", price:"-", color:"bg-orange-100 text-orange-800", tip: "幼童含在團費中 (有座位)。\n長途車程建議準備小玩具或貼紙書安撫。"},
+                  {d:"D4", route:"東山線+Linimo", ticket:"24h券+單程", price:"¥1140", color:"bg-yellow-100 text-yellow-800", tip: "大倉庫內禁推車 (入口免費寄放)。\n部分展區較冷，幼童請帶薄外套。"},
+                  {d:"D5", route:"名鐵巴士", ticket:"套票", price:"¥3700", color:"bg-purple-100 text-purple-800", tip: "套票含¥1000金券，可在 Outlet 或燈會使用。"},
                 ].map((row, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
-                    <span className="font-bold text-gray-500 w-8">{row.d}</span>
-                    <span className={`text-xs px-2 py-1 rounded ${row.color}`}>{row.route}</span>
-                    <div className="flex-1 text-right text-sm">
-                      <div className="font-bold">{row.ticket}</div>
-                      <div className="text-gray-500 text-xs">{row.price}</div>
-                      <div className="text-[10px] text-ghibli-green mt-0.5">{row.tip}</div>
+                  <div key={i} className="flex flex-col gap-2 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-gray-500 w-8">{row.d}</span>
+                      <span className={`text-xs px-2 py-1 rounded ${row.color}`}>{row.route}</span>
+                      <div className="flex-1 text-right text-sm">
+                        <div className="font-bold">{row.ticket}</div>
+                        <div className="text-gray-500 text-xs">{row.price}</div>
+                      </div>
                     </div>
+                    {row.tip && (
+                      <div className="bg-ghibli-green/5 p-2 rounded text-xs text-gray-600 flex gap-2">
+                        <span className="text-ghibli-green font-bold">💡</span>
+                        <span className="whitespace-pre-line">{row.tip}</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -836,6 +920,8 @@
                   2024
                 </div>
               </header>
+
+              <WeatherWidget />
 
               <div className="grid grid-cols-2 gap-3">
                 {ITINERARY_DATA.map(day => (
