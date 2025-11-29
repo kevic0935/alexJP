@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>名古屋 8 天 7 夜 親子自駕遊</title>
     
+    <!-- Load API Key from external file -->
+    <script src="./gak.js"></script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -84,8 +87,8 @@
       import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
       // --- CONFIGURATION ---
-      // ⚠️ 請在此填入您的 Gemini API Key 才能啟用 AI 推薦功能
-      const GEMINI_API_KEY = ""; 
+      // Load from global window object (set in gak.js)
+      const GEMINI_API_KEY = window.GEMINI_API_KEY || "";
 
       // --- DATA ---
 
