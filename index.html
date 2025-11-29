@@ -93,7 +93,7 @@
         ShoppingBag, Footprints, Store, Ticket, Table, TrainFront, Map,
         CheckCircle, XCircle, Clock, Banknote, ClipboardCheck,
         ArrowRightLeft, RefreshCw, Coins, Calculator, ExternalLink,
-        Thermometer, Sparkles, Loader2, MessageCircle
+        Thermometer, Sparkles, Loader2, MessageCircle, Receipt, Trash2, Plus
       } from 'lucide-react';
       import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -494,6 +494,69 @@
         </div>
       );
 
+      const ExpenseTracker = () => {
+        const [items, setItems] = useState(() => {
+            try { return JSON.parse(localStorage.getItem('trip_expenses')) || [] } 
+            catch { return [] }
+        });
+        const [name, setName] = useState('');
+        const [price, setPrice] = useState('');
+        const [cat, setCat] = useState('🍔');
+
+        const cats = [
+            {i:'🍔', n:'餐飲'}, {i:'🚌', n:'交通'}, {i:'🛍️', n:'購物'}, 
+            {i:'🎫', n:'門票'}, {i:'🏠', n:'住宿'}, {i:'📦', n:'其他'}
+        ];
+
+        useEffect(() => localStorage.setItem('trip_expenses', JSON.stringify(items)), [items]);
+
+        const add = () => {
+            if(!name || !price) return;
+            setItems([{id: Date.now(), n: name, p: parseInt(price), c: cat}, ...items]);
+            setName(''); setPrice('');
+        };
+        
+        const del = (id) => setItems(items.filter(i => i.id !== id));
+        const total = items.reduce((a, b) => a + (b.p || 0), 0);
+
+        return (
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-ghibli-green/20">
+                <h3 className="font-bold text-ghibli-green mb-3 flex items-center gap-2">
+                    <Receipt size={18} /> 離線記帳小幫手
+                </h3>
+                {/* Inputs */}
+                <div className="flex gap-2 mb-3">
+                   <select value={cat} onChange={e=>setCat(e.target.value)} className="bg-gray-50 rounded p-2 outline-none">
+                      {cats.map(c => <option key={c.i} value={c.i}>{c.i} {c.n}</option>)}
+                   </select>
+                   <input value={name} onChange={e=>setName(e.target.value)} placeholder="項目" className="flex-1 bg-gray-50 p-2 rounded outline-none" />
+                   <input value={price} onChange={e=>setPrice(e.target.value)} type="number" placeholder="¥" className="w-20 bg-gray-50 p-2 rounded outline-none" />
+                </div>
+                <button onClick={add} className="w-full bg-ghibli-green text-white py-2 rounded-lg font-bold mb-4 flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
+                    <Plus size={16} /> 新增支出
+                </button>
+                {/* List */}
+                <div className="max-h-40 overflow-y-auto space-y-2 mb-3">
+                    {items.map(i => (
+                        <div key={i.id} className="flex justify-between items-center text-sm border-b border-gray-50 pb-1">
+                            <span className="flex items-center gap-2">{i.c} {i.n}</span>
+                            <div className="flex items-center gap-3">
+                                <span className="font-mono">¥{i.p.toLocaleString()}</span>
+                                <button onClick={()=>del(i.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={14}/></button>
+                            </div>
+                        </div>
+                    ))}
+                    {items.length === 0 && <div className="text-center text-gray-400 text-xs py-2">還沒有紀錄喔</div>}
+                </div>
+                {/* Total */}
+                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                    <span className="text-gray-500 font-bold">總支出</span>
+                    <span className="text-xl font-bold text-ghibli-orange font-mono">¥{total.toLocaleString()}</span>
+                </div>
+            </div>
+        )
+      };
+
       const ToolsView = () => {
         const [checklist, setChecklist] = useState({
           passport: false, license: false, insurance: false, 
@@ -600,6 +663,9 @@
                 </a>
               </div>
             </div>
+
+            {/* Offline Expense Tracker */}
+            <ExpenseTracker />
           </div>
         );
       };
