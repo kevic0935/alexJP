@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -95,7 +94,7 @@
         ArrowRightLeft, RefreshCw, Coins, Calculator, ExternalLink,
         Thermometer, Sparkles, Loader2, MessageCircle, Receipt, Trash2, Plus
       } from 'lucide-react';
-      import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+      // Recharts import removed as per user request to delete budget chart
 
       // --- DATA ---
 
@@ -524,33 +523,44 @@
                 <h3 className="font-bold text-ghibli-green mb-3 flex items-center gap-2">
                     <Receipt size={18} /> 離線記帳小幫手
                 </h3>
-                {/* Inputs */}
-                <div className="flex gap-2 mb-3">
-                   <select value={cat} onChange={e=>setCat(e.target.value)} className="bg-gray-50 rounded p-2 outline-none">
-                      {cats.map(c => <option key={c.i} value={c.i}>{c.i} {c.n}</option>)}
-                   </select>
-                   <input value={name} onChange={e=>setName(e.target.value)} placeholder="項目" className="flex-1 bg-gray-50 p-2 rounded outline-none" />
-                   <input value={price} onChange={e=>setPrice(e.target.value)} type="number" placeholder="¥" className="w-20 bg-gray-50 p-2 rounded outline-none" />
+                {/* Modified Inputs Layout (2 Rows) */}
+                <div className="space-y-3 mb-4">
+                  <div className="flex gap-2">
+                     <select value={cat} onChange={e=>setCat(e.target.value)} className="bg-gray-50 rounded-lg p-2.5 outline-none text-sm w-1/3 appearance-none text-center border border-transparent focus:border-ghibli-green/30 transition-all">
+                        {cats.map(c => <option key={c.i} value={c.i}>{c.i} {c.n}</option>)}
+                     </select>
+                     <input value={name} onChange={e=>setName(e.target.value)} placeholder="消費項目" className="flex-1 bg-gray-50 p-2.5 rounded-lg outline-none text-sm border border-transparent focus:border-ghibli-green/30 transition-all" />
+                  </div>
+                  <div className="flex gap-2">
+                     <div className="relative w-5/12">
+                       <span className="absolute left-3 top-2.5 text-gray-400 text-xs">¥</span>
+                       <input value={price} onChange={e=>setPrice(e.target.value)} type="number" placeholder="金額" className="w-full bg-gray-50 pl-7 p-2.5 rounded-lg outline-none text-sm font-mono border border-transparent focus:border-ghibli-green/30 transition-all" />
+                     </div>
+                     <button onClick={add} className="flex-1 bg-ghibli-green text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-1 shadow-sm hover:bg-ghibli-green/90 active:scale-95 transition-all">
+                        <Plus size={16} /> 記一筆
+                     </button>
+                  </div>
                 </div>
-                <button onClick={add} className="w-full bg-ghibli-green text-white py-2 rounded-lg font-bold mb-4 flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all">
-                    <Plus size={16} /> 新增支出
-                </button>
+
                 {/* List */}
-                <div className="max-h-40 overflow-y-auto space-y-2 mb-3">
+                <div className="max-h-48 overflow-y-auto space-y-2 mb-3 pr-1 custom-scrollbar">
                     {items.map(i => (
-                        <div key={i.id} className="flex justify-between items-center text-sm border-b border-gray-50 pb-1">
-                            <span className="flex items-center gap-2">{i.c} {i.n}</span>
+                        <div key={i.id} className="flex justify-between items-center text-sm border-b border-gray-50 pb-2 last:border-0">
+                            <span className="flex items-center gap-2 text-gray-700">
+                              <span className="bg-gray-100 p-1 rounded">{i.c}</span>
+                              <span className="truncate max-w-[8rem]">{i.n}</span>
+                            </span>
                             <div className="flex items-center gap-3">
-                                <span className="font-mono">¥{i.p.toLocaleString()}</span>
-                                <button onClick={()=>del(i.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={14}/></button>
+                                <span className="font-mono font-bold text-gray-600">¥{i.p.toLocaleString()}</span>
+                                <button onClick={()=>del(i.id)} className="text-gray-300 hover:text-red-500 p-1"><Trash2 size={14}/></button>
                             </div>
                         </div>
                     ))}
-                    {items.length === 0 && <div className="text-center text-gray-400 text-xs py-2">還沒有紀錄喔</div>}
+                    {items.length === 0 && <div className="text-center text-gray-300 text-xs py-4 border-2 border-dashed border-gray-100 rounded-lg">還沒有消費紀錄</div>}
                 </div>
                 {/* Total */}
-                <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                    <span className="text-gray-500 font-bold">總支出</span>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                    <span className="text-gray-500 font-bold text-sm">目前總支出</span>
                     <span className="text-xl font-bold text-ghibli-orange font-mono">¥{total.toLocaleString()}</span>
                 </div>
             </div>
@@ -565,13 +575,6 @@
         });
 
         const toggleCheck = (key) => setChecklist(prev => ({...prev, [key]: !prev[key]}));
-
-        const budgetData = [
-          { name: '交通', value: 30000, color: '#4a6c48' },
-          { name: '住宿', value: 45000, color: '#e89e70' },
-          { name: '餐飲', value: 35000, color: '#7da6bd' },
-          { name: '購物', value: 50000, color: '#f4a261' },
-        ];
 
         return (
           <div className="p-4 space-y-6 pb-24 animate-fade-in">
@@ -613,54 +616,6 @@
                     {item.l}
                   </button>
                 ))}
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-800 flex items-center gap-2 mb-3">
-                <Wallet size={18} className="text-orange-500" /> 預算概覽 (TWD)
-              </h3>
-              <div className="h-48 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={budgetData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40}
-                      outerRadius={60}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {budgetData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex justify-center gap-4 text-xs text-gray-500">
-                {budgetData.map((d, i) => (
-                  <div key={i} className="flex items-center gap-1">
-                    <div className="w-2 h-2 rounded-full" style={{backgroundColor: d.color}} />
-                    {d.name}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-red-50 p-4 rounded-xl border border-red-100">
-              <h3 className="font-bold text-red-700 flex items-center gap-2 mb-2">
-                <AlertCircle size={18} /> 緊急聯絡
-              </h3>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <a href="tel:119" className="bg-white p-2 rounded text-center text-red-600 font-bold shadow-sm">
-                  🚑 119 (救護/火警)
-                </a>
-                <a href="tel:110" className="bg-white p-2 rounded text-center text-red-600 font-bold shadow-sm">
-                  👮 110 (警察)
-                </a>
               </div>
             </div>
 
