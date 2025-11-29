@@ -911,9 +911,10 @@
 如果使用者輸入的是問題，請提供專業的親子旅遊建議。
 推薦地點格式請包含：
 1. **地點名稱** (含日文原名)
-2. **距離/位置**
-3. **推薦理由** (針對親子)
-4. **實用資訊** (營業時間、預算)`;
+2. **地圖連結**：請提供 [開啟 Google 地圖] 的 Markdown 連結，網址格式為 https://www.google.com/maps/search/?api=1&query=地點名稱 (請將地點名稱填入 query)
+3. **距離/位置**
+4. **推薦理由** (針對親子)
+5. **實用資訊** (營業時間、預算)`;
 
             // Initialize with the secure process.env.API_KEY
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -1016,6 +1017,7 @@
                       __html: result
                         .replace(/^### (.*$)/gim, '<h3 class="font-bold text-ghibli-green mt-4 mb-2">$1</h3>')
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-500 font-bold hover:underline inline-flex items-center gap-1">$1 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>')
                         .replace(/^\* (.*$)/gim, '<li class="ml-4 list-disc">$1</li>')
                         .replace(/\n/g, '<br/>')
                     }} />
