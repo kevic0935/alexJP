@@ -92,7 +92,8 @@
         ShoppingBag, Footprints, Store, Ticket, Table, TrainFront, Map,
         CheckCircle, XCircle, Clock, Banknote, ClipboardCheck,
         ArrowRightLeft, RefreshCw, Coins, Calculator, ExternalLink,
-        Thermometer, Sparkles, Loader2, MessageCircle, Receipt, Trash2, Plus
+        Thermometer, Sparkles, Loader2, MessageCircle, Receipt, Trash2, Plus,
+        Download, Upload, Copy, Share2
       } from 'lucide-react';
       // Recharts import removed as per user request to delete budget chart
 
@@ -518,10 +519,37 @@
         const del = (id) => setItems(items.filter(i => i.id !== id));
         const total = items.reduce((a, b) => a + (b.p || 0), 0);
 
+        // Export/Import Logic
+        const handleExport = () => {
+          const dataStr = JSON.stringify(items);
+          navigator.clipboard.writeText(dataStr).then(() => {
+            alert('✅ 記帳資料已複製！\n\n您可以將此代碼傳送給家人，或貼在備忘錄中保存。');
+          }).catch(() => {
+            alert('❌ 複製失敗，請手動複製。');
+          });
+        };
+
+        const handleImport = () => {
+          const json = prompt('📥 請貼上您的記帳備份代碼：\n(注意：這將會覆蓋目前的記帳紀錄)');
+          if (json) {
+            try {
+              const parsed = JSON.parse(json);
+              if (Array.isArray(parsed)) {
+                setItems(parsed);
+                alert('✅ 資料還原成功！');
+              } else {
+                alert('❌ 格式錯誤：代碼無效。');
+              }
+            } catch (e) {
+              alert('❌ 還原失敗：代碼格式不正確。');
+            }
+          }
+        };
+
         return (
             <div className="bg-white p-4 rounded-xl shadow-sm border border-ghibli-green/20">
-                <h3 className="font-bold text-ghibli-green mb-3 flex items-center gap-2">
-                    <Receipt size={18} /> 離線記帳小幫手
+                <h3 className="font-bold text-ghibli-green mb-3 flex items-center gap-2 justify-between">
+                    <span className="flex items-center gap-2"><Receipt size={18} /> 離線記帳小幫手</span>
                 </h3>
                 {/* Modified Inputs Layout (2 Rows) */}
                 <div className="space-y-3 mb-4">
@@ -559,9 +587,19 @@
                     {items.length === 0 && <div className="text-center text-gray-300 text-xs py-4 border-2 border-dashed border-gray-100 rounded-lg">還沒有消費紀錄</div>}
                 </div>
                 {/* Total */}
-                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 mb-3">
                     <span className="text-gray-500 font-bold text-sm">目前總支出</span>
                     <span className="text-xl font-bold text-ghibli-orange font-mono">¥{total.toLocaleString()}</span>
+                </div>
+
+                {/* Data Management Footer */}
+                <div className="flex gap-2 border-t border-gray-100 pt-3">
+                  <button onClick={handleExport} className="flex-1 flex items-center justify-center gap-1 text-xs text-gray-500 bg-gray-50 py-2 rounded hover:bg-gray-100 transition-colors">
+                    <Share2 size={12} /> 匯出備份
+                  </button>
+                  <button onClick={handleImport} className="flex-1 flex items-center justify-center gap-1 text-xs text-gray-500 bg-gray-50 py-2 rounded hover:bg-gray-100 transition-colors">
+                    <Download size={12} /> 匯入還原
+                  </button>
                 </div>
             </div>
         )
